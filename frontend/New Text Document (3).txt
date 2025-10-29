@@ -1,0 +1,14 @@
+| **Mục cấu hình (Configuration item)** | **Tên (Name)**              | **Khu vực làm việc (Working area)**         | **Khu vực xem xét lại (Review area)**     | **Khu vực phát hành (Release area / Baseline)** |
+| ------------------------------------- | --------------------------- | ------------------------------------------- | ----------------------------------------- | ----------------------------------------------- |
+| **Project scope document**            | `ScopeDocument.docx`        | `IT3180-Nhom32/04-Users/Nam/ProjectDocs/`   | `IT3180-Nhom32/05-Reviews/ScopeDoc/`      | `IT3180-Nhom32/01-ManagedArea/Scope/`           |
+| **Project plan**                      | `ProjectPlan.docx`          | `IT3180-Nhom32/04-Users/Nam/ProjectDocs/`   | `IT3180-Nhom32/05-Reviews/ProjectDocs/`   | `IT3180-Nhom32/01-ManagedArea/ProjectDocs/`     |
+| **Requirement specification**         | `RequirementSpec.docx`      | `IT3180-Nhom32/04-Users/Nam/Requirements/`  | `IT3180-Nhom32/05-Reviews/Requirements/`  | `IT3180-Nhom32/01-ManagedArea/Requirements/`    |
+| **Design document**                   | `DesignDocument.docx`       | `IT3180-Nhom32/04-Users/Nam/DesignDocs/`    | `IT3180-Nhom32/05-Reviews/DesignDocs/`    | `IT3180-Nhom32/01-ManagedArea/DesignDocs/`      |
+| **Source code**                       | `SourceCode/`               | `IT3180-Nhom32/04-Users/Nam/SourceCode/`    | `IT3180-Nhom32/05-Reviews/CodeReview/`    | `IT3180-Nhom32/01-ManagedArea/SourceCode/`      |
+| **Test plan**                         | `TestPlan.docx`             | `IT3180-Nhom32/04-Users/Nam/TestDocs/`      | `IT3180-Nhom32/05-Reviews/TestDocs/`      | `IT3180-Nhom32/01-ManagedArea/TestDocs/`        |
+| **Test report**                       | `TestReport.docx`           | `IT3180-Nhom32/04-Users/Nam/TestDocs/`      | `IT3180-Nhom32/05-Reviews/TestDocs/`      | `IT3180-Nhom32/01-ManagedArea/TestDocs/`        |
+| **User manual**                       | `UserManual.docx`           | `IT3180-Nhom32/04-Users/Nam/Deliverables/`  | `IT3180-Nhom32/05-Reviews/Deliverables/`  | `IT3180-Nhom32/01-ManagedArea/Deliverables/`    |
+| **Configuration items list**          | `ConfigurationItemsList.md` | `IT3180-Nhom32/04-Users/Nam/ConfigMgmt/`    | `IT3180-Nhom32/05-Reviews/ConfigMgmt/`    | `IT3180-Nhom32/00_Configuration_Management/`    |
+| **Change request log**                | `ChangeRequestLog.xlsx`     | `IT3180-Nhom32/04-Users/Nam/ChangeControl/` | `IT3180-Nhom32/05-Reviews/ChangeControl/` | `IT3180-Nhom32/01-ManagedArea/ChangeControl/`   |
+| **Meeting minutes**                   | `MeetingMinutes/`           | `IT3180-Nhom32/04-Users/Nam/Meetings/`      | `IT3180-Nhom32/05-Reviews/Meetings/`      | `IT3180-Nhom32/01-ManagedArea/Meetings/`        |
+| **Final release package**             | `Release_v1.0.zip`          | `IT3180-Nhom32/04-Users/Nam/Releases/`      | `IT3180-Nhom32/05-Reviews/Releases/`      | `IT3180-Nhom32/01-ManagedArea/Releases/`        |
