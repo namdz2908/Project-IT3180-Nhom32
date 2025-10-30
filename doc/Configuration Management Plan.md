@@ -1,6 +1,6 @@
-# 🏢 Cấu trúc và Tài liệu Dự án: Quản lý thu phí Chung cư BlueMoon
+# Cấu trúc và Tài liệu Dự án: Quản lý thu phí Chung cư BlueMoon
 
-## 1️⃣ Mục tiêu
+## 1️ Mục tiêu
 Phần mềm giúp Ban quản trị chung cư BlueMoon quản lý việc **thu phí, quản lý hộ gia đình, nhân khẩu, thống kê và tra cứu thông tin** một cách tập trung và hiệu quả.
 
 Phiên bản hiện tại: **v1.0**  
@@ -9,7 +9,7 @@ CSDL: **MySQL Server**
 
 ---
 
-## 2️⃣ Cấu trúc thư mục dự án
+## 2️ Cấu trúc thư mục dự án
 
 | STT | Thư mục / File | Mô tả nội dung | Ghi chú |
 |-----|-----------------|----------------|---------|
@@ -33,7 +33,7 @@ CSDL: **MySQL Server**
 
 ---
 
-## 3️⃣ Quy ước đặt tên
+## 3️ Quy ước đặt tên
 
 | Loại đối tượng | Quy ước đặt tên | Ví dụ |
 |----------------|------------------|--------|
@@ -46,7 +46,7 @@ CSDL: **MySQL Server**
 
 ---
 
-## 4️⃣ Khu vực có kiểm soát (Controlled Area)
+## 4️ Khu vực có kiểm soát (Controlled Area)
 Chỉ Ban quản trị và nhóm phát triển được chỉnh sửa:
 
 | Phạm vi | Quyền | Mô tả |
@@ -55,14 +55,4 @@ Chỉ Ban quản trị và nhóm phát triển được chỉnh sửa:
 | `/resources/sql/` | Cập nhật bởi DBA hoặc dev được chỉ định | Script SQL |
 | `/docs/` | Cập nhật bởi nhóm tài liệu | Tài liệu kỹ thuật và hướng dẫn |
 | `/build/` | Tự động, không chỉnh sửa thủ công | Sinh ra bởi IDE |
-
----
-
-## 5️⃣ Ghi chú triển khai Git
-Khi thêm hoặc chỉnh sửa tài liệu, bạn nên commit theo cú pháp chuẩn:
-
-```bash
-git add docs/project_structure.md
-git commit -m "Thêm tài liệu cấu trúc thư mục dự án"
-git push origin main
 
