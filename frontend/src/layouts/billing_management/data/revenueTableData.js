@@ -62,7 +62,7 @@ export default function revenueData() {
 
   const loadFees = async () => {
     try {
-      const response = await axios.get("http://localhost:/fees", {
+      const response = await axios.get("http://localhost:8080/fees", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const filteredFees = response.data.filter((fee) => {
@@ -121,7 +121,7 @@ export default function revenueData() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:/revenue/delete?id=${selectedRevenue.id}`, {
+      await axios.delete(`http://localhost:8080/revenue/delete?id=${selectedRevenue.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Delete revenue successfully!");
@@ -171,7 +171,7 @@ export default function revenueData() {
           apartmentId: id,
         };
         console.log("newconvertedRevenue:", converted);
-        await axios.post("http://localhost:/revenue/create-with-qr", converted, {
+        await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
@@ -209,7 +209,7 @@ export default function revenueData() {
 
   const handleEditSubmit = async () => {
     try {
-      await axios.put(`http://localhost:/revenue/${editRevenue.id}`, editRevenue, {
+      await axios.put(`http://localhost:8080/revenue/${editRevenue.id}`, editRevenue, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Edit revenue successfully!");

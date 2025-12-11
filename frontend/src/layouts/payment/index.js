@@ -23,7 +23,7 @@ export default function PaymentComplete() {
     setLayout(dispatch, "page");
   }, [dispatch]);
   useEffect(() => {
-    const API_URL = "http://localhost:";
+    const API_URL = "http://localhost:8080";
     const fetchPaymentDetails = async () => {
       try {
         console.log("paymentToken trong paymentComplete là: ", paymentToken);
@@ -82,7 +82,7 @@ export default function PaymentComplete() {
                 onClick={async () => {
                   try {
                     const response = await axios.get(
-                      `http://localhost:/revenue/complete-payment/${paymentToken}`,
+                      `http://localhost:8080/revenue/complete-payment/${paymentToken}`,
                       {
                         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                       }

@@ -95,7 +95,7 @@ function Overview() {
         console.error("No user ID available");
         return;
       }
-      const result = await axios.get(`http://localhost:/user/profile/${userId}`, {
+      const result = await axios.get(`http://localhost:8080/user/profile/${userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUser(result.data);
@@ -107,7 +107,7 @@ function Overview() {
 
   const loadResidents = async (userId) => {
     try {
-      const result = await axios.get(`http://localhost:/user/${userId}/apartmentresident`, {
+      const result = await axios.get(`http://localhost:8080/user/${userId}/apartmentresident`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setResidents(result.data);

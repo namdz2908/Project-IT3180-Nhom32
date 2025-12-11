@@ -31,7 +31,7 @@ export default function data() {
 
   const loadFees = async () => {
     try {
-      const response = await axios.get("http://localhost:/fees", {
+      const response = await axios.get("http://localhost:8080/fees", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setFees(response.data);
@@ -70,7 +70,7 @@ export default function data() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:/fees/${selectedFee.type}`, {
+      await axios.delete(`http://localhost:8080/fees/${selectedFee.type}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Delete fee successfully!");
@@ -104,7 +104,7 @@ export default function data() {
 
   const handleCreateSubmit = async () => {
     try {
-      await axios.post("http://localhost:/fees", newFee, {
+      await axios.post("http://localhost:8080/fees", newFee, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Create fee successfully!");
@@ -129,7 +129,7 @@ export default function data() {
 
   const handleEditSubmit = async () => {
     try {
-      await axios.put(`http://localhost:/fees/${editFee.type}`, editFee, {
+      await axios.put(`http://localhost:8080/fees/${editFee.type}`, editFee, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Edit fee successfully!");

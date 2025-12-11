@@ -42,7 +42,7 @@ function EditApartmentForm({ onCancel, onSave }) {
         return;
       }
       const result = await axios.get(
-        `http://localhost:/apartment?apartmentId=${apartmentIdToUse}`,
+        `http://localhost:8080/apartment?apartmentId=${apartmentIdToUse}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       setFormData({
@@ -71,7 +71,7 @@ function EditApartmentForm({ onCancel, onSave }) {
     try {
       console.log("Updating apartment with data:", formData);
       const response = await axios.put(
-        `http://localhost:/apartment/${formData.apartmentId}`,
+        `http://localhost:8080/apartment/${formData.apartmentId}`,
         formData,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

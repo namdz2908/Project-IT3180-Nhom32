@@ -102,7 +102,7 @@ function Apartment() {
 
       console.log(`Loading apartment with ID: ${apartmentIdToUse}`);
       const result = await axios.get(
-        `http://localhost:/apartment?apartmentId=${apartmentIdToUse}`,
+        `http://localhost:8080/apartment?apartmentId=${apartmentIdToUse}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       console.log("Apartment data loaded:", result.data);
@@ -122,7 +122,7 @@ function Apartment() {
         return;
       }
       const response = await axios.get(
-        `http://localhost:/apartment/${apartmentIdToUse}/residents`,
+        `http://localhost:8080/apartment/${apartmentIdToUse}/residents`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       setResidents(response.data);
@@ -195,7 +195,7 @@ function Apartment() {
       setAddingResident(true);
       console.log("Adding resident with citizen ID:", citizenId);
       const response = await axios.put(
-        `http://localhost:/apartment/add-resident/${apartment.apartmentId}?citizenIdentification=${citizenId}`,
+        `http://localhost:8080/apartment/add-resident/${apartment.apartmentId}?citizenIdentification=${citizenId}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       console.log("Add resident response:", response);
@@ -225,7 +225,7 @@ function Apartment() {
       setRemovingResident(true);
       console.log("Removing resident with citizen ID:", citizenId);
       const response = await axios.put(
-        `http://localhost:/apartment/remove-resident/${apartment.apartmentId}?citizenIdentification=${citizenId}`,
+        `http://localhost:8080/apartment/remove-resident/${apartment.apartmentId}?citizenIdentification=${citizenId}`,
         null,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );

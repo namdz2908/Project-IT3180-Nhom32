@@ -40,7 +40,7 @@ export default function data() {
 
   const loadNotifications = async () => {
     try {
-      const res = await axios.get("http://localhost:/notifications", {
+      const res = await axios.get("http://localhost:8080/notifications", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const converted = res.data.map((notification) => ({
@@ -92,7 +92,7 @@ export default function data() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:/notifications/${selectedNotification.id}`, {
+      await axios.delete(`http://localhost:8080/notifications/${selectedNotification.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Delete notification successfully!");
@@ -132,7 +132,7 @@ export default function data() {
         ...newNotification,
         usernames: Array.from(newNotification.usernames),
       };
-      await axios.post("http://localhost:/notifications", converted, {
+      await axios.post("http://localhost:8080/notifications", converted, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Create notification successfully!");
@@ -162,7 +162,7 @@ export default function data() {
         ...editNotification,
         usernames: Array.from(editNotification.usernames),
       };
-      await axios.put(`http://localhost:/notifications/${editNotification.id}`, converted, {
+      await axios.put(`http://localhost:8080/notifications/${editNotification.id}`, converted, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Edit notification successfully!");

@@ -41,7 +41,7 @@ function EditUserForm({ onCancel, onSave }) {
         console.error("No user ID available");
         return;
       }
-      const result = await axios.get(`http://localhost:/user/profile/${userId}`, {
+      const result = await axios.get(`http://localhost:8080/user/profile/${userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setFormData({
@@ -70,7 +70,7 @@ function EditUserForm({ onCancel, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:/user/${formData.id}`, formData, {
+      await axios.put(`http://localhost:8080/user/${formData.id}`, formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Profile updated successfully!");

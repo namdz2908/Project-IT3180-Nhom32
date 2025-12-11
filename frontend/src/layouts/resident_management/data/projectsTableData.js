@@ -196,7 +196,7 @@ export default function data() {
 
   const loadApartments = async () => {
     try {
-      const response = await axios.get("http://localhost:/apartment/all", {
+      const response = await axios.get("http://localhost:8080/apartment/all", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setApartments(response.data);
@@ -263,7 +263,7 @@ export default function data() {
 
   const handleCreateSubmit = async () => {
     try {
-      await axios.post("http://localhost:/apartment", newApartment, {
+      await axios.post("http://localhost:8080/apartment", newApartment, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Create apartment successfully!");

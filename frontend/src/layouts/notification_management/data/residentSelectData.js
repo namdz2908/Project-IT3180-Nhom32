@@ -140,7 +140,7 @@ export default function ResidentSelectData({ selectedUsernames, setSelectedUsern
 
   const loadUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:/user/all", {
+      const response = await axios.get("http://localhost:8080/user/all", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUsers(response.data);

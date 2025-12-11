@@ -210,7 +210,7 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
 
   const loadApartments = async () => {
     try {
-      const response = await axios.get("http://localhost:/apartment/all", {
+      const response = await axios.get("http://localhost:8080/apartment/all", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setApartments(response.data);

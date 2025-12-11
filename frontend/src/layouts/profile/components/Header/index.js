@@ -63,7 +63,7 @@ function Header({ children }) {
         console.error("No user ID available");
         return;
       }
-      const result = await axios.get(`http://localhost:/user/profile/${userId}`, {
+      const result = await axios.get(`http://localhost:8080/user/profile/${userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUser(result.data);

@@ -43,7 +43,7 @@ const UserNotificationPage = () => {
     if (!selectedNotification) return;
     try {
       await axios.delete(
-        `http://localhost:/notifications/user/${selectedNotification.id}/${localStorage.getItem(
+        `http://localhost:8080/notifications/user/${selectedNotification.id}/${localStorage.getItem(
           "id"
         )}`,
         {
@@ -62,7 +62,7 @@ const UserNotificationPage = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get(`http://localhost:/notifications/user/${id}`, {
+        const res = await axios.get(`http://localhost:8080/notifications/user/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         setNotifications(res.data);

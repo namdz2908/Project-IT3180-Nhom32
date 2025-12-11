@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "http://localhost:80808080";
 
 // lấy danh sách hóa đơn
 export const getAllInvoices = async () => {

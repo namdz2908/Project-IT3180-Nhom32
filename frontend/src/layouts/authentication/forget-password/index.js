@@ -25,7 +25,7 @@ function ForgetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:/user/forget-password", {
+      const response = await fetch("http://localhost:8080/user/forget-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: form.username, email: form.email }),
@@ -50,7 +50,7 @@ function ForgetPassword() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:/user/verify-otp?otp=${form.otp}`);
+      const response = await fetch(`http://localhost:8080/user/verify-otp?otp=${form.otp}`);
 
       if (!response.ok) {
         const errorResult = await response.json().catch(() => null);
@@ -85,7 +85,7 @@ function ForgetPassword() {
         password: newPassword,
       };
 
-      const response = await fetch(`http://localhost:/user/change-password`, {
+      const response = await fetch(`http://localhost:8080/user/change-password`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),

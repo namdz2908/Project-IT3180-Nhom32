@@ -138,7 +138,7 @@ export default function data() {
 
   const loadUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:/user/all", {
+      const response = await axios.get("http://localhost:8080/user/all", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setUsers(response.data);
@@ -184,7 +184,7 @@ export default function data() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:/user/delete?id=${selectedUser.id}`, {
+      await axios.delete(`http://localhost:8080/user/delete?id=${selectedUser.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Delete user successfully!");
@@ -230,7 +230,7 @@ export default function data() {
 
   const handleCreateSubmit = async () => {
     try {
-      await axios.post("http://localhost:/user/create", newUser, {
+      await axios.post("http://localhost:8080/user/create", newUser, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Create user successfully!");

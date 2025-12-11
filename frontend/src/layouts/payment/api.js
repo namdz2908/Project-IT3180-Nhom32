@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:"; // URL
+const API_URL = "http://localhost:8080"; // URL
 export const fetchPaymentInfo = async () => {
   try {
     const response = await axios.get(`${API_URL}/payment/complete`, {
