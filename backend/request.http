@@ -1,0 +1,13 @@
+POST http://localhost:7070/user/register
+Content-Type: application/json
+
+{
+  "fullName": "Administrator",
+  "username": "admin",
+  "email": "admin@example.com",
+  "password": "1234",
+  "phoneNumber": "0900000000",
+  "role": "ADMIN",
+  "citizenIdentification": "123456789012",
+  "apartmentId": "A101"
+}
