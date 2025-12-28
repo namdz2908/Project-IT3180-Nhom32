@@ -12,12 +12,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.filter.CorsFilter; 
 
 @SpringBootApplication
 @EnableScheduling  // Enable scheduling for the application
 public class ArpartmentManagingApplication {
-	
 
 	@Bean
     CommandLineRunner printHash(PasswordEncoder encoder) {

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.UUID;
 import java.util.HashMap;
 
-
 @Primary
 @Service
 public class RevenueService {
@@ -49,31 +48,32 @@ public class RevenueService {
                 })
                 .collect(Collectors.toList());
     }
+
     // Get Revenue Information (by Id for backend testing)
-    public ResponseEntity<?> getRevenue(Long id){
+    public ResponseEntity<?> getRevenue(Long id) {
         if (id != null) {
             Revenue revenue = revenueRepository.findById(id)
                     .orElseThrow(() -> new RevenueNotFoundException(id));
             Apartment apartment = revenue.getApartment();
-            return ResponseEntity.ok(new RevenueDTO(revenue,apartment));
+            return ResponseEntity.ok(new RevenueDTO(revenue, apartment));
         } else {
             return ResponseEntity.badRequest().body("Must provide id");
         }
     }
 
     // Get Revenue Information (by APid and Type for frontend search)
-    public ResponseEntity<?> getRevenueByApartmentandType(String apartmentId, String type){
-        Revenue revenue = revenueRepository.findByApartment_ApartmentIdAndType(apartmentId,type)
+    public ResponseEntity<?> getRevenueByApartmentandType(String apartmentId, String type) {
+        Revenue revenue = revenueRepository.findByApartment_ApartmentIdAndType(apartmentId, type)
                 .orElseThrow(() -> new RevenueNotFoundExceptionType(type));
         Apartment apartment = apartmentRepository.findByApartmentId(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
-        return ResponseEntity.ok(new RevenueDTO(revenue,apartment));
+        return ResponseEntity.ok(new RevenueDTO(revenue, apartment));
     }
 
     public List<Revenue> getRevenueByApartmentId(String apartmentId) {
         return revenueRepository.findByApartment_ApartmentId(apartmentId);
-    }    
-    
+    }
+
     @Transactional
     // Create Revenue
     public Revenue createRevenue(RevenueDTO revenueDTO) {
@@ -87,26 +87,25 @@ public class RevenueService {
                 .orElseThrow(() -> new ApartmentNotFoundException(revenueDTO.getApartmentId()));
 
         Revenue revenue = new Revenue();
-        
+
         // For Service type, automatically use the apartment area as the used value
         if ("Service".equals(revenueDTO.getType()) && apartment.getArea() != null) {
             revenue.setUsed(apartment.getArea());
         } else {
             revenue.setUsed(revenueDTO.getUsed());
         }
-        
+
         revenue.setStatus(revenueDTO.getStatus());
         revenue.setType(revenueDTO.getType());
-        
+
         // Set end date if provided
         if (revenueDTO.getEndDate() != null) {
             revenue.setEndDate(revenueDTO.getEndDate());
         }
-//        else{
-//            revenue.setEndDate(LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay());
-//        }        // Set apartment (already retrieved above)
+        // else{
+        // revenue.setEndDate(LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay());
+        // } // Set apartment (already retrieved above)
         revenue.setApartment(apartment);
-
 
         Optional<Fee> feeOpt = feeRepository.findByType(revenueDTO.getType());
         double calculatedTotal = feeOpt.map(fee -> revenueDTO.getUsed() * fee.getPricePerUnit()).orElse(0.0);
@@ -132,15 +131,14 @@ public class RevenueService {
             // Remove from list and break relationship
             apartment.getRevenues().removeIf(r -> r.getId().equals(id));
             revenue.setApartment(null);
-            
+
             // Update total and save
             apartment.setTotal(calculateTotalPayment(apartment.getApartmentId()));
             apartmentRepository.save(apartment);
         }
-        
+
         revenueRepository.deleteById(id);
     }
-
 
     @Transactional
     public Revenue updateRevenueByID(RevenueDTO revenueDTO, Long id) {
@@ -148,29 +146,30 @@ public class RevenueService {
                 .map(existingRevenue -> {
                     // Update status
                     existingRevenue.setStatus(revenueDTO.getStatus());
-                    
+
                     // Update used value if provided
                     if (revenueDTO.getUsed() > 0) {
                         existingRevenue.setUsed(revenueDTO.getUsed());
-                        
+
                         // Recalculate total based on new used value
                         Fee fee = feeRepository.findByType(existingRevenue.getType())
-                                .orElseThrow(() -> new FeeNotFoundException("Fee not found for type: " + existingRevenue.getType()));
-                        
+                                .orElseThrow(() -> new FeeNotFoundException(
+                                        "Fee not found for type: " + existingRevenue.getType()));
+
                         double newTotal = existingRevenue.getUsed() * fee.getPricePerUnit();
                         existingRevenue.setTotal(newTotal);
                     }
-                    
+
                     // Save the updated revenue
                     Revenue savedRevenue = revenueRepository.save(existingRevenue);
-                    
+
                     // Update apartment's total
                     Apartment apartment = savedRevenue.getApartment();
                     if (apartment != null) {
                         apartment.setTotal(calculateTotalPayment(apartment.getApartmentId()));
                         apartmentRepository.save(apartment);
                     }
-                    
+
                     return savedRevenue;
                 })
                 .orElseThrow(() -> new RevenueNotFoundException(id));
@@ -180,8 +179,15 @@ public class RevenueService {
     public Double calculateTotalPayment(String apartmentId) {
         // Lấy danh sách các mục tiêu thụ của căn hộ
         List<Revenue> revenues = revenueRepository.findByApartment_ApartmentId(apartmentId);
+        
+        // if (revenues.isEmpty()) {
+        // throw new RuntimeException("No revenue records found for apartment: " +
+        // apartmentId);
+        // }
+
+        // Nếu không còn khoản thu nào thì tổng = 0
         if (revenues.isEmpty()) {
-            throw new RuntimeException("No revenue records found for apartment: " + apartmentId);
+            return 0.0;
         }
 
         double totalPayment = 0.0;
@@ -189,20 +195,20 @@ public class RevenueService {
         for (Revenue revenue : revenues) {
             // Update status based on end date
             revenue.updateStatus();
-            
-            if("Unpaid".equals(revenue.getStatus()) || "Overdue".equals(revenue.getStatus())) {
+
+            if ("Unpaid".equals(revenue.getStatus()) || "Overdue".equals(revenue.getStatus())) {
                 // Tìm mức giá tương ứng với loại tiêu thụ
                 Fee fee = feeRepository.findByType(revenue.getType())
                         .orElseThrow(() -> new RuntimeException("Fee not found for type: " + revenue.getType()));
 
                 // Tính tiền của mục tiêu thụ này
                 double cost = revenue.getUsed() * fee.getPricePerUnit();
-                
+
                 // // Add penalty for overdue payments (e.g., 10% extra)
                 // if ("Overdue".equals(revenue.getStatus())) {
-                //     cost *= 1.1; // 10% penalty for overdue payments
+                // cost *= 1.1; // 10% penalty for overdue payments
                 // }
-                
+
                 totalPayment += cost;
             }
         }
@@ -211,7 +217,7 @@ public class RevenueService {
 
     // danh sach full khoan thu cua 1 can ho
     public List<Revenue> findAllRevenueByApartmentId(String apartmentId) {
-        Optional<Apartment> apartment =  apartmentRepository.findByApartmentId(apartmentId);
+        Optional<Apartment> apartment = apartmentRepository.findByApartmentId(apartmentId);
         return apartment.map(Apartment::getRevenues).orElse(null);
     }
 
@@ -274,27 +280,28 @@ public class RevenueService {
         revenue.setPaidDate(LocalDateTime.now());
         return revenueRepository.save(revenue);
     }
+
     @Transactional
-    public Revenue getRevenueByPaymentToken(String paymentToken){
+    public Revenue getRevenueByPaymentToken(String paymentToken) {
         return revenueRepository.findByPaymentToken(paymentToken)
                 .orElseThrow(() -> new RevenueNotFoundException("Payment not found"));
     }
 
-//    public double calculateUsedValue(Revenue revenue, Apartment apartment) {
-//        if ("Service".equals(revenue.getType()) && apartment != null) {
-//            return apartment.getArea();
-//        }
-//        return revenue.getUsed();
-//    }
-//
-//    public double calculateTotal(Revenue revenue, Fee fee) {
-//        double usedValue = calculateUsedValue(revenue, revenue.getApartment());
-//        return usedValue * fee.getPricePerUnit();
-//    }
+    // public double calculateUsedValue(Revenue revenue, Apartment apartment) {
+    // if ("Service".equals(revenue.getType()) && apartment != null) {
+    // return apartment.getArea();
+    // }
+    // return revenue.getUsed();
+    // }
+    //
+    // public double calculateTotal(Revenue revenue, Fee fee) {
+    // double usedValue = calculateUsedValue(revenue, revenue.getApartment());
+    // return usedValue * fee.getPricePerUnit();
+    // }
     @Transactional
     public void updateAllRevenue() {
         List<Revenue> revenues = revenueRepository.findAll();
-        for(Revenue revenue : revenues) {
+        for (Revenue revenue : revenues) {
             revenue.updateStatus();
         }
     }
@@ -303,10 +310,10 @@ public class RevenueService {
         List<Revenue> revenues = revenueRepository.findByApartment_ApartmentId(apartmentId);
 
         List<Revenue> contributions = new java.util.ArrayList<>(List.of());
-        for(Revenue re : revenues){
+        for (Revenue re : revenues) {
             String type = re.getType();
-            if(feeService.getFeeByType(type).isPresent()) {
-                if(feeService.getFeeByType(type).get().getPricePerUnit() == 1){
+            if (feeService.getFeeByType(type).isPresent()) {
+                if (feeService.getFeeByType(type).get().getPricePerUnit() == 1) {
                     contributions.add(re);
                 }
             }
@@ -323,10 +330,10 @@ public class RevenueService {
     public List<RevenueDTO> getRevenuesNotContribution(String apartmentId) {
         List<Revenue> revenues = revenueRepository.findByApartment_ApartmentId(apartmentId);
         List<Revenue> contributions = new java.util.ArrayList<>(List.of());
-        for(Revenue re : revenues){
+        for (Revenue re : revenues) {
             String type = re.getType();
-            if(feeService.getFeeByType(type).isPresent()) {
-                if(feeService.getFeeByType(type).get().getPricePerUnit() != 1){
+            if (feeService.getFeeByType(type).isPresent()) {
+                if (feeService.getFeeByType(type).get().getPricePerUnit() != 1) {
                     contributions.add(re);
                 }
             }
@@ -349,19 +356,18 @@ public class RevenueService {
     public List<RevenueDTO> getRevenuesByCreateDate(LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.plusDays(1).atStartOfDay().minusSeconds(1);
-        
+
         List<Revenue> revenues = revenueRepository.findAll().stream()
                 .filter(revenue -> {
                     LocalDateTime createDate = revenue.getCreateDate();
-                    return createDate != null && 
-                           createDate.isAfter(startOfDay) && 
-                           createDate.isBefore(endOfDay);
+                    return createDate != null &&
+                            createDate.isAfter(startOfDay) &&
+                            createDate.isBefore(endOfDay);
                 })
                 .collect(Collectors.toList());
-                
+
         return revenues.stream()
                 .map(revenue -> new RevenueDTO(revenue, revenue.getApartment()))
                 .collect(Collectors.toList());
     }
 }
-

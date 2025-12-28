@@ -111,8 +111,9 @@ public class ApartmentController {
     }
 
     // Remove resident from apartment - Admin only
+    // Remove resident from apartment - Admin only
     @PutMapping("/remove-resident/{apartmentId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isResidentOfApartment(#apartmentId)")
     public ResponseEntity<?> removeResidentFromApartment(
             @PathVariable String apartmentId,
             @RequestParam(required = false) Long userId,
@@ -134,9 +135,9 @@ public class ApartmentController {
         }
     }
 
+
     // Calculate total revenue - Admin or resident of the apartment
     @PutMapping("/{apartmentId}/total")
-    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isResidentOfApartment(#apartmentId)")
     public ResponseEntity<?> totalRevenueOfApartment(@PathVariable String apartmentId) {
         try {
             Apartment apartment = apartmentRepository.findByApartmentId(apartmentId)
