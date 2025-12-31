@@ -91,9 +91,19 @@ export default function revenueData() {
       ),
       total: <MDTypography variant="caption">{formatCurrency(bill.total)}</MDTypography>,
       status: (
-        <MDBox color={bill.status === "Paid" ? "success" : "error"}>
-          <Icon>{bill.status === "Paid" ? "check_circle" : "error"}</Icon>
-          {bill.status === "Paid" ? " Paid" : "Unpaid"}
+        <MDBox
+          color={
+            bill.status === "Paid" ? "success" : bill.status === "Overdue" ? "warning" : "error"
+          }
+        >
+          <Icon>
+            {bill.status === "Paid"
+              ? "check_circle"
+              : bill.status === "Overdue"
+              ? "warning"
+              : "error"}
+          </Icon>
+          {` ${bill.status}`}
         </MDBox>
       ),
       apartmentId: bill.apartmentId,
@@ -228,12 +238,6 @@ export default function revenueData() {
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (editRevenue.status?.toString().toLowerCase() === "paid") {
-      alert("You can't edit the paid one");
-      return;
-    }
-
     setEditRevenue((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -274,24 +278,25 @@ export default function revenueData() {
       ),
       total: <MDTypography variant="caption">{formatCurrency(bill.total)}</MDTypography>,
       status: (
-        <MDBox color={bill.status === "Paid" ? "success" : "error"}>
-          <Icon>{bill.status === "Paid" ? "check_circle" : "error"}</Icon>
-          {bill.status === "Paid" ? " Paid" : " Unpaid"}
+        <MDBox
+          color={
+            bill.status === "Paid" ? "success" : bill.status === "Overdue" ? "warning" : "error"
+          }
+        >
+          <Icon>
+            {bill.status === "Paid"
+              ? "check_circle"
+              : bill.status === "Overdue"
+              ? "warning"
+              : "error"}
+          </Icon>
+          {` ${bill.status}`}
         </MDBox>
       ),
       apartmentId: bill.apartmentId,
       action: (
         <MDBox display="flex" gap={1}>
-          <MDButton
-            variant="text"
-            color="info"
-            onClick={() => handleEditClick(bill)}
-            disabled={bill.status?.toLowerCase().trim() === "paid"}
-            sx={{
-              opacity: bill.status?.toLowerCase().trim() === "paid" ? 0.5 : 1,
-              pointerEvents: bill.status?.toLowerCase().trim() === "paid" ? "none" : "auto",
-            }}
-          >
+          <MDButton variant="text" color="info" onClick={() => handleEditClick(bill)}>
             <Icon>edit</Icon>
           </MDButton>
           <MDButton variant="text" color="error" onClick={() => handleDeleteClick(bill)}>
@@ -326,9 +331,19 @@ export default function revenueData() {
       ),
       total: <MDTypography variant="caption">{formatCurrency(bill.total)}</MDTypography>,
       status: (
-        <MDBox color={bill.status === "Paid" ? "success" : "error"}>
-          <Icon>{bill.status === "Paid" ? "check_circle" : "error"}</Icon>
-          {bill.status === "Paid" ? " Paid" : " Unpaid"}
+        <MDBox
+          color={
+            bill.status === "Paid" ? "success" : bill.status === "Overdue" ? "warning" : "error"
+          }
+        >
+          <Icon>
+            {bill.status === "Paid"
+              ? "check_circle"
+              : bill.status === "Overdue"
+              ? "warning"
+              : "error"}
+          </Icon>
+          {` ${bill.status}`}
         </MDBox>
       ),
       apartmentId: bill.apartmentId,
@@ -466,6 +481,27 @@ export default function revenueData() {
               onChange={handleEditInputChange}
               fullWidth
             />
+            <MDBox fullWidth label="Status">
+              <select
+                name="status"
+                value={editRevenue.status}
+                onChange={handleEditInputChange}
+                style={{
+                  height: "42px",
+                  padding: "0 10px",
+                  borderRadius: "8px",
+                  borderColor: "#d2d6da",
+                  width: "100%",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                }}
+              >
+                <option value="Unpaid">Unpaid</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </MDBox>
             {/* <MDInput
               label="Price Per Unit"
               name="pricePerUnit"
