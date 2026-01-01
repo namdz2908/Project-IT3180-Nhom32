@@ -60,9 +60,13 @@ function EditApartmentForm({ onCancel, onSave }) {
   };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]:
+        (name === "floor" || name === "area" || name === "occupants") && value !== ""
+          ? Number(value)
+          : value,
     });
   };
 
@@ -85,11 +89,7 @@ function EditApartmentForm({ onCancel, onSave }) {
         "Error updating apartment:",
         error.response ? error.response.data : error.message
       );
-      alert(
-        `Failed to update apartment: ${
-          error.response ? JSON.stringify(error.response.data) : error.message
-        }`
-      );
+      alert("Failed to update apartment: The number of residents does not match.");
     }
   };
 
@@ -116,10 +116,11 @@ function EditApartmentForm({ onCancel, onSave }) {
             <MDInput
               label="Floor"
               name="floor"
+              type="number"
               value={formData.floor}
               onChange={handleInputChange}
               fullWidth
-              inputProps={{ readOnly: true }}
+              inputProps={{ min: 1 }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -130,6 +131,7 @@ function EditApartmentForm({ onCancel, onSave }) {
               value={formData.area}
               onChange={handleInputChange}
               fullWidth
+              inputProps={{ min: 1 }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -157,8 +159,21 @@ function EditApartmentForm({ onCancel, onSave }) {
               type="number"
               value={formData.occupants}
               onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                  e.preventDefault();
+                }
+              }}
               fullWidth
-              inputProps={{ readOnly: true }}
+              sx={{
+                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+                  margin: 0,
+                  WebkitAppearance: "none",
+                },
+                "& input[type=number]": {
+                  MozAppearance: "textfield",
+                },
+              }}
             />
           </Grid>
         </Grid>

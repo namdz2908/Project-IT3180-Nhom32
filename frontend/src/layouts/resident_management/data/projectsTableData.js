@@ -38,7 +38,7 @@ import logoSlack from "assets/images/small-logos/logo-slack.svg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data() {
+export default function useProjectsTableData() {
   const Apartment = ({ id, type }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar
@@ -189,6 +189,15 @@ export default function data() {
     apartmentType: "",
     occupants: 0,
   });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingApartment, setEditingApartment] = useState({
+    apartmentId: "",
+    floor: 1,
+    area: 100,
+    owner: "",
+    apartmentType: "",
+    occupants: 0,
+  });
 
   useEffect(() => {
     loadApartments();
@@ -257,7 +266,7 @@ export default function data() {
     const { name, value } = e.target;
     setNewApartment((prev) => ({
       ...prev,
-      [name]: name === "floor" || name === "area" ? Number(value) : value,
+      [name]: (name === "floor" || name === "area") && value !== "" ? Number(value) : value,
     }));
   };
 
@@ -273,6 +282,44 @@ export default function data() {
       console.error("Error creating apartment:", error);
       setErrorMessage("Failed to create apartment. Please try again.");
       handleCreateClose();
+    }
+  };
+
+  const handleEditClick = (apartment) => {
+    setEditingApartment(apartment);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false);
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingApartment((prev) => ({
+      ...prev,
+      [name]:
+        (name === "floor" || name === "area" || name === "occupants") && value !== ""
+          ? Number(value)
+          : value,
+    }));
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/apartment/${editingApartment.apartmentId}`,
+        editingApartment,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      alert("Update apartment successfully!");
+      loadApartments();
+      handleEditClose();
+    } catch (error) {
+      console.error("Error updating apartment:", error);
+      setErrorMessage("Failed to update apartment. Please try again.");
     }
   };
 
@@ -321,14 +368,19 @@ export default function data() {
       area: <Area size={apartment.area || 0} />,
       type: <ApartmentType type={apartment.apartmentType || "N/A"} />,
       action: (
-        <MDButton
-          variant="text"
-          color="info"
-          component={Link}
-          to={`/apartment/${apartment.apartmentId}`}
-        >
-          Details
-        </MDButton>
+        <MDBox display="flex" gap={1}>
+          <MDButton
+            variant="text"
+            color="info"
+            component={Link}
+            to={`/apartment/${apartment.apartmentId}`}
+          >
+            Details
+          </MDButton>
+          <MDButton variant="text" color="warning" onClick={() => handleEditClick(apartment)}>
+            Edit
+          </MDButton>
+        </MDBox>
       ),
     }));
   };
@@ -352,7 +404,7 @@ export default function data() {
           <DialogTitle>Create New Apartment</DialogTitle>
           <DialogContent>
             <MDBox display="flex" flexDirection="column" gap={2} mt={2}>
-              <TextField
+              <MDInput
                 label="Apartment ID"
                 name="apartmentId"
                 value={newApartment.apartmentId}
@@ -360,7 +412,7 @@ export default function data() {
                 fullWidth
                 required
               />
-              <TextField
+              <MDInput
                 label="Floor"
                 name="floor"
                 type="number"
@@ -370,7 +422,7 @@ export default function data() {
                 required
                 inputProps={{ min: 1 }}
               />
-              <TextField
+              <MDInput
                 label="Area"
                 name="area"
                 type="number"
@@ -380,30 +432,89 @@ export default function data() {
                 required
                 inputProps={{ min: 1 }}
               />
-              <TextField
+              <MDInput
                 label="ApartmentType"
                 name="apartmentType"
                 value={newApartment.apartmentType}
                 onChange={handleInputChange}
                 fullWidth
-                inputProps={{ min: 1 }}
               />
-              <TextField
+              <MDInput
                 label="Owner"
                 name="owner"
                 value={newApartment.owner}
                 onChange={handleInputChange}
                 fullWidth
-                inputProps={{ min: 1 }}
               />
             </MDBox>
           </DialogContent>
+
           <DialogActions>
             <MDButton onClick={handleCreateClose} color="dark">
               Cancel
             </MDButton>
             <MDButton onClick={handleCreateSubmit} color="info" variant="gradient">
               Create
+            </MDButton>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={editDialogOpen} onClose={handleEditClose} maxWidth="sm" fullWidth>
+          <DialogTitle>Edit Apartment: {editingApartment?.apartmentId}</DialogTitle>
+          <DialogContent>
+            <MDBox display="flex" flexDirection="column" gap={2} mt={2}>
+              <MDInput
+                label="Floor"
+                name="floor"
+                type="number"
+                value={editingApartment?.floor || ""}
+                onChange={handleEditInputChange}
+                fullWidth
+                required
+                inputProps={{ min: 1 }}
+              />
+              <MDInput
+                label="Area"
+                name="area"
+                type="number"
+                value={editingApartment?.area || ""}
+                onChange={handleEditInputChange}
+                fullWidth
+                required
+                inputProps={{ min: 1 }}
+              />
+              <MDInput
+                label="Apartment Type"
+                name="apartmentType"
+                value={editingApartment?.apartmentType || ""}
+                onChange={handleEditInputChange}
+                fullWidth
+              />
+              <MDInput
+                label="Owner"
+                name="owner"
+                value={editingApartment?.owner || ""}
+                onChange={handleEditInputChange}
+                fullWidth
+              />
+              <MDInput
+                label="Occupants"
+                name="occupants"
+                type="number"
+                value={editingApartment?.occupants || 0}
+                onChange={handleEditInputChange}
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+            </MDBox>
+          </DialogContent>
+
+          <DialogActions>
+            <MDButton onClick={handleEditClose} color="dark">
+              Cancel
+            </MDButton>
+            <MDButton onClick={handleEditSubmit} color="info" variant="gradient">
+              Save Changes
             </MDButton>
           </DialogActions>
         </Dialog>

@@ -92,6 +92,12 @@ public class ApartmentService {
     public Apartment updateApartment(Apartment newApartment, String apartmentId) {
         return apartmentRepository.findByApartmentId(apartmentId)
                 .map(apartment -> {
+                    // Check if new occupancy count matches actual resident list size
+                    int actualResidentCount = apartment.getResidents().size();
+                    if (newApartment.getOccupants() != actualResidentCount) {
+                        throw new IllegalArgumentException("Số lượng nhân khẩu không khớp");
+                    }
+
                     apartment.setFloor(newApartment.getFloor());
                     apartment.setOccupants(newApartment.getOccupants());
                     apartment.setIsOccupied(newApartment.getOccupants() > 0);

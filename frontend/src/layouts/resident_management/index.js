@@ -30,11 +30,11 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import useAuthorsTableData from "layouts/resident_management/data/authorsTableData";
-import projectsTableData from "layouts/resident_management/data/projectsTableData";
+import useProjectsTableData from "layouts/resident_management/data/projectsTableData";
 
 function Tables() {
   const { columns, rows, searchUI } = useAuthorsTableData();
-  const { columns: pColumns, rows: pRows, searchUI: pSearchUI } = projectsTableData();
+  const { columns: pColumns, rows: pRows, searchUI: pSearchUI } = useProjectsTableData();
 
   return (
     <DashboardLayout>
