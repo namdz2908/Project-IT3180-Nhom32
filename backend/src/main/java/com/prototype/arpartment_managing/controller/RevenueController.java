@@ -2,6 +2,8 @@ package com.prototype.arpartment_managing.controller;
 
 import com.prototype.arpartment_managing.dto.RevenueDTO;
 import com.prototype.arpartment_managing.model.Revenue;
+import com.prototype.arpartment_managing.repository.RevenueRepository;
+import com.prototype.arpartment_managing.repository.UserRepository;
 import com.prototype.arpartment_managing.scheduler.RevenueScheduler;
 import com.prototype.arpartment_managing.service.RevenueService;
 import jakarta.transaction.Transactional;
@@ -17,17 +19,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("http://localhost:5000")
 @RequestMapping("/revenue")
 public class RevenueController {
     @Autowired
+    private RevenueRepository revenueRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private RevenueService revenueService;
-    
+
     @Autowired
     private RevenueScheduler revenueScheduler;
-    
+
     @Autowired
     private com.prototype.arpartment_managing.util.LogMonitor logMonitor;
 
@@ -38,10 +47,11 @@ public class RevenueController {
         return revenueService.getAllRevenues();
     }
 
-//    @GetMapping("/revenue")
-//    public List<Revenue> getRevenueByApartmentId(@RequestParam(required = false) String apartmentId) {
-//        return revenueService.findAllRevenueByApartmentId(apartmentId);
-//    }
+    // @GetMapping("/revenue")
+    // public List<Revenue> getRevenueByApartmentId(@RequestParam(required = false)
+    // String apartmentId) {
+    // return revenueService.findAllRevenueByApartmentId(apartmentId);
+    // }
 
     // Create revenue - Admin only
     @PostMapping
@@ -87,12 +97,12 @@ public class RevenueController {
         revenueService.deleteRevenue(id);
         return ResponseEntity.status(HttpStatus.CREATED).body("Revenue delete successfully");
     }
-//    // xong 1 khoan thu => xoa => can status ??
-//    @DeleteMapping("/deleterevenue")
-//    public String deleteRevenue(@RequestBody Revenue revenue) {
-//        revenueService.deleteRevenue(revenue.getId());
-//        return "Deleted Revenue";
-//    }
+    // // xong 1 khoan thu => xoa => can status ??
+    // @DeleteMapping("/deleterevenue")
+    // public String deleteRevenue(@RequestBody Revenue revenue) {
+    // revenueService.deleteRevenue(revenue.getId());
+    // return "Deleted Revenue";
+    // }
 
     // Update revenue - Admin only
     @PutMapping("/{id}")
@@ -108,17 +118,18 @@ public class RevenueController {
         return revenueService.getRevenueByApartmentId(apartmentId);
     }
 
-//    // tinh tien 1 khoan thu
-//    @GetMapping("/revenue/{apartment_id}/{fee}")
-//    public double getRevenueFee(@PathVariable String apartment_id, @PathVariable String fee) {
-//        return revenueService.calculateFee(apartment_id, fee);
-//    }
-//
-//    //tinh tong khoan thu
-//    @GetMapping("/revenue/total/{apartmentId}")
-//    public double getTotalRevenue(@PathVariable String apartmentId) {
-//        return revenueService.calculateTotalPayment(apartmentId);
-//    }
+    // // tinh tien 1 khoan thu
+    // @GetMapping("/revenue/{apartment_id}/{fee}")
+    // public double getRevenueFee(@PathVariable String apartment_id, @PathVariable
+    // String fee) {
+    // return revenueService.calculateFee(apartment_id, fee);
+    // }
+    //
+    // //tinh tong khoan thu
+    // @GetMapping("/revenue/total/{apartmentId}")
+    // public double getTotalRevenue(@PathVariable String apartmentId) {
+    // return revenueService.calculateTotalPayment(apartmentId);
+    // }
 
     @PostMapping("/create-with-qr")
     public ResponseEntity<?> createRevenueWithQR(@RequestBody RevenueDTO revenueDTO) {
@@ -139,10 +150,10 @@ public class RevenueController {
     }
 
     @GetMapping("/getQRCode/{paymentToken}")
-    public  ResponseEntity<?> getQRCode(@PathVariable String paymentToken){
-        try{
+    public ResponseEntity<?> getQRCode(@PathVariable String paymentToken) {
+        try {
             Map<String, Object> response = revenueService.getQRCode(paymentToken);
-            return  ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -168,9 +179,10 @@ public class RevenueController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @GetMapping("/updateAll")
     public ResponseEntity<?> updateAllRevenues() {
-        try{
+        try {
             revenueService.updateAllRevenue();
             return ResponseEntity.ok("Revenue update successfully");
         } catch (Exception e) {
@@ -182,7 +194,8 @@ public class RevenueController {
     @PreAuthorize("hasRole('ADMIN') or @userSecurity.isResidentOfApartment(#apartmentId)")
     public List<RevenueDTO> getContribution(@PathVariable String apartmentId) {
         return revenueService.getAllContributions(apartmentId);
-    }    
+    }
+
     @PreAuthorize("hasRole('ADMIN') or @userSecurity.isResidentOfApartment(#apartmentId)")
     @GetMapping("/not-contribution/{apartmentId}")
     public List<RevenueDTO> getRevenueNotContribution(@PathVariable String apartmentId) {
@@ -196,13 +209,13 @@ public class RevenueController {
         try {
             // Record the count of revenues before
             int countBefore = revenueService.getAllRevenues().size();
-            
+
             // Trigger the scheduler manually
             revenueScheduler.manuallyTriggerRevenueGeneration();
-            
+
             // Get the count after generation
             int countAfter = revenueService.getAllRevenues().size();
-            
+
             // Return informative response
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
@@ -211,7 +224,7 @@ public class RevenueController {
             response.put("revenuesAfter", countAfter);
             response.put("revenuesCreated", countAfter - countBefore);
             response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity
@@ -219,7 +232,7 @@ public class RevenueController {
                     .body("Failed to generate monthly revenues: " + e.getMessage());
         }
     }
-    
+
     // Verify recently created revenues - Admin only
     @GetMapping("/verify-generated")
     @PreAuthorize("hasRole('ADMIN')")
@@ -232,15 +245,15 @@ public class RevenueController {
             } else {
                 checkDate = LocalDate.now();
             }
-            
+
             // Get revenues created today or on specified date
             List<RevenueDTO> todayRevenues = revenueService.getRevenuesByCreateDate(checkDate);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("date", checkDate);
             response.put("revenueCount", todayRevenues.size());
             response.put("revenues", todayRevenues);
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity
@@ -259,20 +272,71 @@ public class RevenueController {
             if (date != null && !date.isEmpty()) {
                 checkDate = LocalDate.parse(date);
             }
-            
+
             List<String> logs = logMonitor.getRevenueGenerationLogs(checkDate);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("date", checkDate != null ? checkDate : "all");
             response.put("logCount", logs.size());
             response.put("logs", logs);
             response.put("wereRevenuesGeneratedToday", logMonitor.wereRevenuesGeneratedToday());
-            
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to retrieve revenue generation logs: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/upcoming")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<RevenueDTO>> getUpcomingRevenues(
+            @RequestParam(defaultValue = "7") int daysAhead) {
+
+        LocalDateTime now = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endDate = now.plusDays(daysAhead).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        // Get current authentication
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        String username = auth.getName();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        List<Revenue> revenues;
+        if (isAdmin) {
+            // Admin sees everything
+            revenues = revenueRepository.findUpcomingDueDates(now, endDate);
+        } else {
+            // Individual user sees only their apartment's revenues
+            com.prototype.arpartment_managing.model.User currentUser = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (currentUser.getApartment() != null) {
+                revenues = revenueRepository.findUpcomingDueDatesByApartment(
+                        currentUser.getApartment().getApartmentId(), now, endDate);
+            } else {
+                revenues = java.util.Collections.emptyList();
+            }
+        }
+
+        List<RevenueDTO> dtos = revenues.stream()
+                .map(revenue -> new RevenueDTO(revenue, revenue.getApartment()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getStatistics() {
+        try {
+            return ResponseEntity.ok(revenueService.getRevenueStatistics());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to retrieve statistics: " + e.getMessage());
         }
     }
 }

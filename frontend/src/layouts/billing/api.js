@@ -170,3 +170,17 @@ export const getRevenueNotContribution = async (apartmentId) => {
     return null;
   }
 };
+
+//  THÊM VÀO CUỐI FILE (trước function cuối cùng)
+export const getUpcomingRevenues = async (daysAhead = 7) => {
+  try {
+    const response = await axios.get(`${API_URL}/revenue/upcoming`, {
+      params: { daysAhead },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy revenues sắp đến hạn:", error);
+    return [];
+  }
+};

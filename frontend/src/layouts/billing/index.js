@@ -3,10 +3,10 @@
 * Material Dashboard 2 React - v2.2.0
 =========================================================
 
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
+* Product Page: [https://www.creative-tim.com/product/material-dashboard-react](https://www.creative-tim.com/product/material-dashboard-react)
 * Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
-Coded by www.creative-tim.com
+Coded by [www.creative-tim.com](https://www.creative-tim.com)
 
  =========================================================
 
@@ -31,13 +31,34 @@ import AddRevenue from "layouts/billing/components/add-bill";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Calendar from "layouts/billing/components/calendar";
+import { useState, useEffect } from "react";
+import { getUpcomingRevenues } from "./api";
 import Icon from "@mui/material/Icon";
 import MDTypography from "components/MDTypography";
 import DataTable from "examples/Tables/DataTable";
 import Card from "@mui/material/Card";
 import PaidBills from "layouts/billing/components/PaidBills";
 import ContributionInformation from "./components/ContributionInformation";
+
 function Billing() {
+  const [revenues, setRevenues] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchRevenues = async () => {
+      try {
+        setLoading(true);
+        const data = await getUpcomingRevenues(7);
+        setRevenues(data);
+      } catch (error) {
+        console.error("Lỗi fetch revenues:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRevenues();
+  }, []);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -109,7 +130,7 @@ function Billing() {
               </Grid>
             </Grid>
             <Grid item xs={12} lg={4}>
-              <Calendar />
+              <Calendar revenues={revenues} daysAhead={7} />
               <PaidBills />
             </Grid>
           </Grid>

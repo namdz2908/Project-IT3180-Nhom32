@@ -25,6 +25,10 @@ public class RevenueDTO {
     private LocalDateTime createDate;
     
     private LocalDateTime endDate;
+
+    private String dueDate;        // Thêm ISO string cho frontend
+    
+    private String apartmentName;  // Thêm Tên căn hộ
     
     // Constructor without dependencies
     public RevenueDTO() {
@@ -46,6 +50,18 @@ public class RevenueDTO {
         this.total = revenue.getTotal();
         this.createDate = revenue.getCreateDate();
         this.endDate = revenue.getEndDate();
+
+        // THÊM 2 DÒNG NÀY
+        this.dueDate = (this.endDate != null) ? this.endDate.toString() : null;
+        this.apartmentName = (apartment != null) ? apartment.getApartmentId() : "Unknown";
+    }
+
+    public String getDueDate() { 
+        return dueDate; 
+    }
+
+    public void setDueDate(String dueDate) { 
+        this.dueDate = dueDate; 
     }
 
     public long getId() {
