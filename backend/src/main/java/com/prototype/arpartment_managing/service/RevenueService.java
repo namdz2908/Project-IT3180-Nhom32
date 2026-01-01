@@ -179,7 +179,7 @@ public class RevenueService {
     public Double calculateTotalPayment(String apartmentId) {
         // Lấy danh sách các mục tiêu thụ của căn hộ
         List<Revenue> revenues = revenueRepository.findByApartment_ApartmentId(apartmentId);
-        
+
         // if (revenues.isEmpty()) {
         // throw new RuntimeException("No revenue records found for apartment: " +
         // apartmentId);
@@ -345,6 +345,55 @@ public class RevenueService {
                 })
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Get revenues created on a specific date
+     * Useful for verifying that scheduled revenue generation is working
+     * 
+     * @param date The date to check for created revenues
+     * @return List of revenues created on the specified date
+     */
+    /**
+     * Get revenue statistics aggregated by type and status
+     * 
+     * @return A map containing aggregated statistics
+     */
+    public Map<String, Object> getRevenueStatistics() {
+        List<Revenue> allRevenues = revenueRepository.findAll();
+
+        // 1. Total revenue by type
+        Map<String, Double> revenueByType = allRevenues.stream()
+                .collect(Collectors.groupingBy(
+                        Revenue::getType,
+                        Collectors.summingDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)));
+
+        // 2. Count by status
+        Map<String, Long> countByStatus = allRevenues.stream()
+                .collect(Collectors.groupingBy(
+                        Revenue::getStatus,
+                        Collectors.counting()));
+
+        // 3. Monthly revenue data (last 6 months)
+        Map<String, Double> monthlyRevenue = new HashMap<>();
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
+
+        allRevenues.stream()
+                .filter(r -> r.getCreateDate() != null && r.getCreateDate().isAfter(sixMonthsAgo))
+                .forEach(r -> {
+                    String monthYear = r.getCreateDate().getMonth().toString() + " " + r.getCreateDate().getYear();
+                    monthlyRevenue.merge(monthYear, r.getTotal() != null ? r.getTotal() : 0.0, Double::sum);
+                });
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("revenueByType", revenueByType);
+        stats.put("countByStatus", countByStatus);
+        stats.put("monthlyRevenue", monthlyRevenue);
+        stats.put("totalOverall",
+                allRevenues.stream().mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0).sum());
+
+        return stats;
+    }
+
 
     /**
      * Get revenues created on a specific date
