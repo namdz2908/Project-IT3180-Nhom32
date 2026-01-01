@@ -18,7 +18,15 @@ Coded by www.creative-tim.com
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Icon, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
+import {
+  Icon,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+} from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -115,7 +123,9 @@ export default function useAuthorsTableData() {
   );
 
   const [users, setUsers] = useState([]);
+  const [apartments, setApartments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
   const [searchType, setSearchType] = useState("username"); // username or apartmentId
   const [errorMessage, setErrorMessage] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -134,7 +144,19 @@ export default function useAuthorsTableData() {
 
   useEffect(() => {
     loadUsers();
+    loadApartments();
   }, []);
+
+  const loadApartments = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/apartment/all", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setApartments(response.data);
+    } catch (error) {
+      console.error("Failed to load apartments:", error);
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -399,14 +421,38 @@ export default function useAuthorsTableData() {
                 fullWidth
                 required
               />
-              <TextField
+              <MDInput
+                select
                 label="Apartment ID"
                 name="apartmentId"
                 value={newUser.apartmentId}
                 onChange={handleInputChange}
-                fullWidth
                 required
-              />
+                sx={{
+                  width: "544px",
+                  "& .MuiInputBase-root": {
+                    height: "44px",
+                  },
+                  "& .MuiInputLabel-root": {
+                    lineHeight: "1.1",
+                    top: "0px",
+                  },
+                  "& .MuiInputLabel-shrink": {
+                    top: "0",
+                  },
+                  "& .MuiSelect-select": {
+                    display: "flex",
+                    alignItems: "center",
+                    paddingLeft: "12px",
+                  },
+                }}
+              >
+                {apartments.map((apt) => (
+                  <MenuItem key={apt.id} value={apt.apartmentId}>
+                    {apt.apartmentId} - Floor {apt.floor}
+                  </MenuItem>
+                ))}
+              </MDInput>
             </MDBox>
           </DialogContent>
           <DialogActions>
