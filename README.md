@@ -6,9 +6,12 @@ Trước khi bắt đầu sử dụng ứng dụng, bạn cần đảm bảo má
 
 1. **IDE để chạy Java**:
 
-   - Đảm bảo rằng bạn đã cài đặt một IDE hỗ trợ Java, ví dụ như IntelliJ IDEA hoặc Eclipse. IntelliJ IDEA là một lựa chọn tốt và dễ sử dụng cho việc phát triển ứng dụng Java.
+   - Đảm bảo rằng bạn đã cài đặt một IDE hỗ trợ Java, ví dụ như IntelliJ IDEA,VS Code hoặc Eclipse.
 
-2. **Node.js và npm**:
+2. **MySQL**:
+   - Đảm bảo rằng bạn đã cài đặt MySQL và đã tạo database local trên máy tính của mình.
+
+3. **Node.js và npm**:
    - Cài đặt **Node.js** và **npm** (Node Package Manager) để có thể chạy phần frontend của ứng dụng. Bạn có thể tải Node.js tại [link chính thức](https://nodejs.org/en/).
    - Sau khi cài đặt, bạn có thể kiểm tra lại bằng cách mở terminal và chạy lệnh:
      ```
@@ -16,6 +19,8 @@ Trước khi bắt đầu sử dụng ứng dụng, bạn cần đảm bảo má
      npm -v
      ```
      Điều này sẽ giúp bạn chắc chắn rằng cả Node.js và npm đã được cài đặt thành công.
+
+
 
 ## Hướng dẫn cách chạy ứng dụng
 
@@ -25,33 +30,69 @@ Sau khi đã cài đặt tất cả các công cụ cần thiết, bạn có th�
 
 Trước tiên, bạn cần **clone repository** từ GitHub về máy tính của mình. Mở terminal hoặc Git Bash và chạy lệnh sau:
 
-### Bước 2: Chạy Backend
+```bash
+git clone https://github.com/namdz2908/Project-IT3180-Nhom32.git
+cd Project-IT3180-Nhom32
+```
 
-1. Mở thư mục `backend` trong IDE IntelliJ IDEA (hoặc bất kỳ IDE Java nào mà bạn chọn).
-2. Trong thư mục `backend -> src -> main -> java`, tìm và mở file `ArpartmentManagingApplication.java`.
-3. Chạy ứng dụng Java này bằng cách nhấn vào nút **Run** trong IntelliJ IDEA hoặc sử dụng lệnh phù hợp với IDE bạn đang sử dụng.
+### Bước 2: Cấu hình database
 
-Lúc này, backend của ứng dụng sẽ bắt đầu chạy và phục vụ dữ liệu cho frontend.
+1. Mở công cụ quản trị MySQL (như MySQL Workbench hoặc phpMyAdmin).
+2. Kết nối tới Server Local (mặc định tại `localhost:3306`) và tạo một **Schema (Database)** mới với tên tùy chọn (Ví dụ: `bluemoon`).
+3. **Nạp dữ liệu mẫu để test:**
+   * Trong MySQL Workbench, vào mục **File** -> **Open SQL Script**.
+   * Chọn file `database/init_test_data.sql` nằm trong thư mục gốc của dự án.
+   * Nhấn nút **Execute** (hình tia sét) để tạo Database và thêm các bản ghi mẫu (Căn hộ & Người dùng).
+4. Cấu hình thông tin kết nối trong file `backend/src/main/resources/application.properties` để khớp với máy của bạn:
+   ```properties
+   # Đảm bảo URL trỏ đúng về localhost:3306 và tên Schema bạn đã tạo
+   spring.datasource.url=jdbc:mysql://localhost:3306/<Your_Schema_Name>
+   spring.datasource.username=root
+   spring.datasource.password=<Your_Database_Password>
+   ```
 
-### Bước 3: Chạy Frontend
+### Bước 3: Chạy Backend
 
-1. Mở thư mục `frontend` trong IDE hoặc bất kỳ text editor nào hỗ trợ JavaScript như Visual Studio Code.
-2. Mở terminal trong thư mục `frontend` và chạy lần lượt các lệnh sau để cài đặt các package cần thiết:
-   Sau khi quá trình cài đặt hoàn tất, bạn chạy lệnh sau để khởi động frontend: npm start
-3. Trình duyệt web của bạn sẽ tự động mở ra một cửa sổ với địa chỉ `http://localhost:3000`. Đây là nơi bạn có thể truy cập và sử dụng ứng dụng.
+1. Mở terminal tại thư mục `backend`.
+2. Chạy lệnh sau để khởi động server (Yêu cầu Java 17+):
+   ```bash
+   # Cách 1: Sử dụng Maven cài sẵn
+   mvn spring-boot:run
+   
+   # Cách 2: Sử dụng wrapper đi kèm (Window: mvnw.cmd, Linux/MacOS: ./mvnw)
+   ./mvnw spring-boot:run
+   ```
+3. **Hoặc sử dụng IDE (IntelliJ, VS Code):** Tìm và chạy trực tiếp file `ApartmentManagingApplication.java` (nằm trong thư mục `src/main/java/com/prototype/arpartment_managing/`).
+
+4. Backend sẽ chạy mặc định tại cổng `8080`.
+
+### Bước 4: Chạy Frontend
+
+1. Mở terminal tại thư mục `frontend`.
+2. Cài đặt các thư viện cần thiết (chỉ cần chạy lần đầu):
+   ```bash
+   npm install
+   ```
+3. Khởi động ứng dụng frontend:
+   ```bash
+   npm start
+   ```
+4. Trình duyệt web của bạn sẽ tự động mở trang `http://localhost:5000`.
 
 ### Kiểm tra hoạt động của ứng dụng
 
-Khi bạn đã chạy thành công cả backend và frontend, bạn có thể mở trình duyệt và truy cập vào địa chỉ `http://localhost:3000`. Nếu mọi thứ đã được cấu hình đúng, bạn sẽ thấy giao diện chính của ứng dụng.
+Khi bạn đã chạy thành công cả backend và frontend, bạn có thể truy cập `http://localhost:5000`. Hệ thống sẽ tự động kết nối với API tại cổng `8080`.
 
 ## Đăng nhập vào ứng dụng
 
-Khi mở ứng dụng, bạn sẽ được yêu cầu đăng nhập. Sử dụng thông tin tài khoản mặc định sau để đăng nhập:
+Sử dụng tài khoản mặc định sau để trải nghiệm đầy đủ tính năng:
 
-- **Tên đăng nhập**: `admin`
-- **Mật khẩu**: `1234`
+- **Quyền Admin**:
+  - **Tên đăng nhập**: `admin`
+  - **Mật khẩu**: `1234`
+- **Quyền Cư dân**:
+  - Sử dụng tài khoản do Admin tạo trong mục **Resident Management**.
 
-Sau khi đăng nhập thành công, bạn sẽ được chuyển đến giao diện chính của ứng dụng với các tính năng cơ bản.
 
 ## Các chức năng chính trong ứng dụng
 
