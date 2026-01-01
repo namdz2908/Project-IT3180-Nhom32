@@ -2,33 +2,44 @@
 =========================================================
 * Material Dashboard 2 React - v2.2.0
 =========================================================
+
+* Product Page: https://www.creative-tim.com/product/material-dashboard-react
+* Copyright 2023 Creative Tim (https://www.creative-tim.com)
+
+Coded by www.creative-tim.com
+
+ =========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+// @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 
+// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
+// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
-import useAuthorsTableData from "layouts/resident_management/data/authorsTableData";
+// Data
+import useProjectsTableData from "layouts/apartment_management/data/projectsTableData";
 
-function Tables() {
-  const { columns, rows, searchUI } = useAuthorsTableData();
+function ApartmentManagement() {
+  const { columns, rows, searchUI } = useProjectsTableData();
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            {/* ===== RESIDENT TABLE ===== */}
             <Card>
               <MDBox
                 mx={2}
@@ -78,7 +89,7 @@ function Tables() {
                       defaultValue: 10,
                       entries: [5, 10, 15, 20, 25],
                     }}
-                    showTotalEntries
+                    showTotalEntries={true}
                     noEndBorder
                     canSearch={false}
                   />
@@ -88,10 +99,9 @@ function Tables() {
           </Grid>
         </Grid>
       </MDBox>
-
       <Footer />
     </DashboardLayout>
   );
 }
 
-export default Tables;
+export default ApartmentManagement;

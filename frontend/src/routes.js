@@ -45,6 +45,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import PaymentComplete from "layouts/payment";
 import BillingTable from "layouts/billing_management";
+import ApartmentManagement from "layouts/apartment_management";
 import NotificationTable from "layouts/notification_management";
 import UserNotificationPage from "layouts/notification";
 import UserContributionTable from "layouts/contribution";
@@ -88,6 +89,25 @@ const routes = [
         )
       ) : (
         <Tables />
+      ),
+    hidden: userRole === "USER",
+    hidden: !token,
+  },
+  {
+    type: "collapse",
+    name: "Apartment Management",
+    key: "apartment-management",
+    icon: <Icon fontSize="small">apartment</Icon>,
+    route: "/manage/apartment",
+    component:
+      userRole === "USER" ? (
+        () => (
+          <div style={{ padding: 32, fontSize: 24 }}>
+            You don&apos;t have permission to access this
+          </div>
+        )
+      ) : (
+        <ApartmentManagement />
       ),
     hidden: userRole === "USER",
     hidden: !token,
