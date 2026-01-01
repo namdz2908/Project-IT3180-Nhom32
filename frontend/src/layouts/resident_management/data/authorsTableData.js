@@ -122,6 +122,12 @@ export default function useAuthorsTableData() {
     </MDBox>
   );
 
+  const MovedOutAt = ({ date }) => (
+    <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+      {date ? new Date(date).toLocaleString("vi-VN") : "N/A"}
+    </MDTypography>
+  );
+
   const [users, setUsers] = useState([]);
   const [apartments, setApartments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,6 +136,9 @@ export default function useAuthorsTableData() {
   const [errorMessage, setErrorMessage] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [selectedRestoreUser, setSelectedRestoreUser] = useState(null);
+  const [newApartmentId, setNewApartmentId] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     fullName: "",
@@ -266,60 +275,141 @@ export default function useAuthorsTableData() {
     }
   };
 
-  // Generate rows dynamically based on filtered users
+  const handleRestoreClick = (user) => {
+    setSelectedRestoreUser(user);
+    if (apartments.length > 0) {
+      setNewApartmentId(apartments[0].apartmentId);
+    }
+    setRestoreDialogOpen(true);
+  };
+
+  const handleRestoreClose = () => {
+    setRestoreDialogOpen(false);
+    setSelectedRestoreUser(null);
+    setNewApartmentId("");
+  };
+
+  const handleRestoreSubmit = async () => {
+    try {
+      await axios.post(
+        `http://localhost:8080/user/restore/${selectedRestoreUser.id}`,
+        { newApartmentId },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      alert("Restore user successfully!");
+      loadUsers();
+      handleRestoreClose();
+    } catch (error) {
+      console.error("Error restoring user:", error);
+      const errorMessage =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.error || "Failed to restore user. Please try again.";
+      alert(errorMessage);
+    }
+  };
+
+  // Generate rows for active users
   const generateRows = () => {
     if (users.length === 0) {
       return [];
     }
 
-    return users.map((user) => ({
-      author: (
-        <Author
-          image={user.id % 3 === 0 ? team2 : user.id % 3 === 1 ? team3 : team4}
-          name={user.fullName || "N/A"}
-          email={user.email || "N/A"}
-        />
-      ),
-      role: <Role title={user.role || "N/A"} />,
-      apartmentId: <ApartmentId id={user.apartmentId || "N/A"} />,
-      action: (
-        <MDBox display="flex" alignItems="center" gap={1}>
-          <MDButton
-            variant="text"
-            color="info"
-            component={Link}
-            to={`/profile/${user.id}`}
-            sx={{
-              "& .material-icons-round": {
-                transform: "scale(1.4)",
-                transition: "transform 0.2s ease-in-out",
-              },
-              "&:hover .material-icons-round": {
-                transform: "scale(1.6)",
-              },
-            }}
-          >
-            <Icon>edit</Icon>
-          </MDButton>
-          <MDButton
-            variant="text"
-            color="error"
-            onClick={() => handleDeleteClick(user)}
-            sx={{
-              "& .material-icons-round": {
-                transform: "scale(1.4)",
-                transition: "transform 0.2s ease-in-out",
-              },
-              "&:hover .material-icons-round": {
-                transform: "scale(1.6)",
-              },
-            }}
-          >
-            <Icon>delete</Icon>
-          </MDButton>
-        </MDBox>
-      ),
-    }));
+    return users
+      .filter((user) => user.active) // Filter active users
+      .map((user) => ({
+        author: (
+          <Author
+            image={user.id % 3 === 0 ? team2 : user.id % 3 === 1 ? team3 : team4}
+            name={user.fullName || "N/A"}
+            email={user.email || "N/A"}
+          />
+        ),
+        role: <Role title={user.role || "N/A"} />,
+        apartmentId: <ApartmentId id={user.apartmentId || "N/A"} />,
+        action: (
+          <MDBox display="flex" alignItems="center" gap={1}>
+            <MDButton
+              variant="text"
+              color="info"
+              component={Link}
+              to={`/profile/${user.id}`}
+              sx={{
+                "& .material-icons-round": {
+                  transform: "scale(1.4)",
+                  transition: "transform 0.2s ease-in-out",
+                },
+                "&:hover .material-icons-round": {
+                  transform: "scale(1.6)",
+                },
+              }}
+            >
+              <Icon>edit</Icon>
+            </MDButton>
+            <MDButton
+              variant="text"
+              color="error"
+              onClick={() => handleDeleteClick(user)}
+              sx={{
+                "& .material-icons-round": {
+                  transform: "scale(1.4)",
+                  transition: "transform 0.2s ease-in-out",
+                },
+                "&:hover .material-icons-round": {
+                  transform: "scale(1.6)",
+                },
+              }}
+            >
+              <Icon>delete</Icon>
+            </MDButton>
+          </MDBox>
+        ),
+      }));
+  };
+
+  // Generate rows for inactive users
+  const generateInactiveRows = () => {
+    if (users.length === 0) {
+      return [];
+    }
+
+    return users
+      .filter((user) => !user.active) // Filter inactive users
+      .map((user) => ({
+        author: (
+          <Author
+            image={user.id % 3 === 0 ? team2 : user.id % 3 === 1 ? team3 : team4}
+            name={user.fullName || "N/A"}
+            email={user.email || "N/A"}
+          />
+        ),
+        role: <Role title={user.role || "N/A"} />,
+        apartmentId: <ApartmentId id={user.apartmentId || "N/A"} />,
+        movedOutAt: <MovedOutAt date={user.movedOutAt} />,
+        action: (
+          <MDBox display="flex" alignItems="center" gap={1}>
+            <MDButton
+              variant="text"
+              color="success"
+              onClick={() => handleRestoreClick(user)}
+              sx={{
+                "& .material-icons-round": {
+                  transform: "scale(1.4)",
+                  transition: "transform 0.2s ease-in-out",
+                },
+                "&:hover .material-icons-round": {
+                  transform: "scale(1.6)",
+                },
+              }}
+              title="Restore User"
+            >
+              <Icon>restore</Icon>
+            </MDButton>
+          </MDBox>
+        ),
+      }));
   };
 
   return {
@@ -331,6 +421,16 @@ export default function useAuthorsTableData() {
     ],
 
     rows: generateRows(),
+
+    inactiveColumns: [
+      { Header: "User", accessor: "author", width: "35%", align: "left" },
+      { Header: "Role", accessor: "role", width: "15%", align: "left" },
+      { Header: "Apartment ID", accessor: "apartmentId", width: "15%", align: "center" },
+      { Header: "Moved Out At", accessor: "movedOutAt", width: "20%", align: "center" },
+      { Header: "Action", accessor: "action", width: "15%", align: "center" },
+    ],
+
+    inactiveRows: generateInactiveRows(),
 
     // Search UI with dropdown to select search type
     searchUI: (
@@ -349,6 +449,40 @@ export default function useAuthorsTableData() {
             </MDButton>
             <MDButton onClick={handleDeleteConfirm} color="error" variant="gradient">
               Delete
+            </MDButton>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={restoreDialogOpen} onClose={handleRestoreClose}>
+          <DialogTitle>Restore User</DialogTitle>
+          <DialogContent>
+            <MDBox display="flex" flexDirection="column" gap={2}>
+              <MDTypography>
+                Select a new apartment for {selectedRestoreUser?.fullName}:
+              </MDTypography>
+              <TextField
+                select
+                label="New Apartment"
+                value={newApartmentId}
+                onChange={(e) => setNewApartmentId(e.target.value)}
+                fullWidth
+                SelectProps={{
+                  native: true,
+                }}
+              >
+                {apartments.map((apt) => (
+                  <option key={apt.id} value={apt.apartmentId}>
+                    {apt.apartmentId} - Floor {apt.floor}
+                  </option>
+                ))}
+              </TextField>
+            </MDBox>
+          </DialogContent>
+          <DialogActions>
+            <MDButton onClick={handleRestoreClose} color="dark">
+              Cancel
+            </MDButton>
+            <MDButton onClick={handleRestoreSubmit} color="success" variant="gradient">
+              Restore
             </MDButton>
           </DialogActions>
         </Dialog>

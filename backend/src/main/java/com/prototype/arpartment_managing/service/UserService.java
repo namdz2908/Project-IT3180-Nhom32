@@ -54,7 +54,6 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .filter(User::isActive)
                 .map(UserDTO::new)
                 .collect(Collectors.toList());
     }
@@ -184,24 +183,13 @@ public class UserService {
         }
 
         // 1. Gỡ liên kết giữa User và Notifications
-        Set<Notification> notifications = user.getNotifications();
-        for (Notification notification : notifications) {
-            notification.getUsers().remove(user);
-            notificationRepository.save(notification);
-        }
-        user.getNotifications().clear(); // gỡ liên kết từ phía user
-
-        // 2. Gỡ liên kết với Apartment và cập nhật số lượng
-        Apartment apartment = user.getApartment();
-        if (apartment != null && apartment.getResidents() != null) {
-            // Remove from list and break relationship
-            apartment.getResidents().removeIf(r -> r.getId().equals(id));
-            user.setApartment(null);
-
-            // Update and save
-            apartment.setOccupants(apartment.getResidents().size());
-            apartment.setIsOccupied(!apartment.getResidents().isEmpty());
-            apartmentRepository.save(apartment);
+        if (user.getNotifications() != null) {
+            Set<Notification> notifications = new HashSet<>(user.getNotifications()); // Prevent ConcurrentModification
+            for (Notification notification : notifications) {
+                notification.getUsers().remove(user);
+                notificationRepository.save(notification);
+            }
+            user.getNotifications().clear();
         }
 
         // 3. Thực hiện Soft Delete và Giải phóng Unique Key
@@ -213,6 +201,24 @@ public class UserService {
         user.setCitizenIdentification(user.getCitizenIdentification() + suffix);
 
         userRepository.save(user);
+
+        // 2. Cập nhật số lượng người ở trong Apartment (Tính toán lại dựa trên active
+        // users)
+        Apartment apartment = user.getApartment();
+        if (apartment != null && apartment.getResidents() != null) {
+            // Không xóa user khỏi danh sách residents để giữ lịch sử
+            // apartment.getResidents().removeIf(r -> r.getId().equals(id));
+            // user.setApartment(null); // Không set null vì apartment_id là not nullable
+
+            // Tính toán lại số người đang hoạt động
+            long activeCount = apartment.getResidents().stream()
+                    .filter(User::isActive)
+                    .count();
+
+            apartment.setOccupants((int) activeCount);
+            apartment.setIsOccupied(activeCount > 0);
+            apartmentRepository.save(apartment);
+        }
     }
 
     // Login
@@ -373,4 +379,48 @@ public class UserService {
         return false;
     }
 
+    @Transactional
+    public void restoreUser(Long userId, String newApartmentId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (user.isActive()) {
+            throw new IllegalArgumentException("User is already active");
+        }
+
+        // Restore Username & CCCD (remove _del_ suffix)
+        String originalUsername = user.getUsername().split("_del_")[0];
+        String originalCCCD = user.getCitizenIdentification().split("_del_")[0];
+
+        // Check if the original username/CCCD is taken by a NEW user
+        if (userRepository.findByUsername(originalUsername).isPresent()) {
+            throw new IllegalArgumentException("Username '" + originalUsername + "' is already taken by another user.");
+        }
+        if (userRepository.findByCitizenIdentification(originalCCCD).isPresent()) {
+            throw new IllegalArgumentException("CCCD '" + originalCCCD + "' is already taken by another user.");
+        }
+
+        // Validate New Apartment
+        Apartment newApartment = apartmentRepository.findByApartmentId(newApartmentId)
+                .orElseThrow(() -> new ApartmentNotFoundException(newApartmentId));
+
+        // Restore fields
+        user.setUsername(originalUsername);
+        user.setCitizenIdentification(originalCCCD);
+        user.setActive(true);
+        user.setMovedOutAt(null);
+        user.setApartment(newApartment);
+
+        userRepository.save(user);
+
+        // Update New Apartment Occupancy
+        if (newApartment.getResidents() == null) {
+            newApartment.setResidents(new ArrayList<>());
+        }
+        newApartment.getResidents().add(user); // Add to new list
+        long activeCount = newApartment.getResidents().stream().filter(User::isActive).count();
+        newApartment.setOccupants((int) activeCount);
+        newApartment.setIsOccupied(activeCount > 0);
+        apartmentRepository.save(newApartment);
+    }
 }

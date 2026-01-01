@@ -70,7 +70,7 @@ public class UserController {
     // Get all users - Admin only
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    List<UserDTO> getAllUsers(){
+    List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -93,9 +93,27 @@ public class UserController {
     @Transactional
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    ResponseEntity<?> deleteUser(@RequestParam(required = false) Long id){
+    ResponseEntity<?> deleteUser(@RequestParam(required = false) Long id) {
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.CREATED).body("User delete successfully");
+    }
+
+    // Restore user - Admin only
+    @PostMapping("/restore/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> restoreUser(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        String newApartmentId = request.get("newApartmentId");
+        if (newApartmentId == null) {
+            return ResponseEntity.badRequest().body("New Apartment ID is required");
+        }
+        try {
+            userService.restoreUser(id, newApartmentId);
+            return ResponseEntity.ok("User restored successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to restore user");
+        }
     }
 
     // Update user - Admin or own profile
@@ -115,7 +133,7 @@ public class UserController {
     // Get user's apartment - Admin or own apartment
     @GetMapping("/{id}/apartment")
     @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
-    public Apartment getApartmentOfUser(@PathVariable Long id){
+    public Apartment getApartmentOfUser(@PathVariable Long id) {
         return userService.getApartmentofUser(id);
     }
 

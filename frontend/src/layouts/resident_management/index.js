@@ -19,7 +19,7 @@ import DataTable from "examples/Tables/DataTable";
 import useAuthorsTableData from "layouts/resident_management/data/authorsTableData";
 
 function Tables() {
-  const { columns, rows, searchUI } = useAuthorsTableData();
+  const { columns, rows, searchUI, inactiveColumns, inactiveRows } = useAuthorsTableData();
 
   return (
     <DashboardLayout>
@@ -85,6 +85,73 @@ function Tables() {
                 </MDBox>
               </MDBox>
             </Card>
+
+            {/* ===== INACTIVE RESIDENT TABLE ===== */}
+            <MDBox mt={6}>
+              <Card>
+                <MDBox
+                  mx={2}
+                  mt={-3}
+                  py={3}
+                  px={2}
+                  variant="gradient"
+                  bgColor="secondary" // Use a different color to distinguish
+                  borderRadius="lg"
+                  coloredShadow="secondary"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <MDBox>
+                    <MDTypography
+                      variant="h6"
+                      color="white"
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <Icon sx={{ mr: 1 }}>person_off</Icon>
+                      Inactive Residents
+                    </MDTypography>
+                    <MDTypography variant="button" color="white" opacity={0.8}>
+                      History of residents who have moved out
+                    </MDTypography>
+                  </MDBox>
+                </MDBox>
+
+                <MDBox px={2} py={3}>
+                  <MDBox
+                    sx={{
+                      overflowX: "auto",
+                      maxHeight: "500px",
+                      "& .MuiTableRow-root:hover": {
+                        backgroundColor: ({ palette: { grey } }) => grey[100],
+                        cursor: "pointer",
+                        transition: "all 0.2s ease-in-out",
+                      },
+                    }}
+                  >
+                    {inactiveRows.length > 0 ? (
+                      <DataTable
+                        table={{ columns: inactiveColumns, rows: inactiveRows }}
+                        isSorted={false}
+                        entriesPerPage={{
+                          defaultValue: 5,
+                          entries: [5, 10, 15],
+                        }}
+                        showTotalEntries
+                        noEndBorder
+                        canSearch={false}
+                      />
+                    ) : (
+                      <MDBox textAlign="center" py={3}>
+                        <MDTypography variant="button" color="text" opacity={0.6}>
+                          No inactive residents found
+                        </MDTypography>
+                      </MDBox>
+                    )}
+                  </MDBox>
+                </MDBox>
+              </Card>
+            </MDBox>
           </Grid>
         </Grid>
       </MDBox>
