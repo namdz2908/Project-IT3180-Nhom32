@@ -253,19 +253,47 @@ export default function data() {
               <option value="pricePerUnit">Price Per Unit</option>
             </select>
           </MDBox>
-          <MDInput
-            label={`Search by ${searchType}`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&:hover fieldset": {
-                  borderColor: ({ palette: { info } }) => info.main,
+          {searchType === "type" ? (
+            <MDBox mr={1} sx={{ width: "100%" }}>
+              <select
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  height: "44px", // Match MDInput height
+                  padding: "0 15px",
+                  borderRadius: "8px",
+                  borderColor: "#d2d6da",
+                  width: "100%",
+                  fontSize: "0.875rem",
+                  color: "#495057",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  backgroundColor: "transparent",
+                }}
+              >
+                <option value="">All Types</option>
+                {[...new Set(fees.map((fee) => fee.type))].map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </MDBox>
+          ) : (
+            <MDInput
+              label={`Search by ${searchType}`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&:hover fieldset": {
+                    borderColor: ({ palette: { info } }) => info.main,
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          )}
           <MDButton
             type="submit"
             variant="gradient"
