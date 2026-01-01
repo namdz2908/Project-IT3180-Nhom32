@@ -33,7 +33,7 @@ import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
-export default function data() {
+export default function useAuthorsTableData() {
   const Author = ({ image, name, email }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar
@@ -162,9 +162,10 @@ export default function data() {
         return user.username?.toLowerCase().includes(searchTerm.toLowerCase());
       } else if (searchType === "apartmentId") {
         return user.apartmentId?.toString() === searchTerm.trim();
-      } else if (searchType === "apartmentId") {
+      } else if (searchType === "role") {
         return user.role?.toString().toLowerCase() === searchTerm.trim();
       }
+
       return false;
     });
 

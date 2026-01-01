@@ -29,11 +29,11 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import authorsTableData from "layouts/resident_management/data/authorsTableData";
+import useAuthorsTableData from "layouts/resident_management/data/authorsTableData";
 import projectsTableData from "layouts/resident_management/data/projectsTableData";
 
 function Tables() {
-  const { columns, rows, searchUI } = authorsTableData();
+  const { columns, rows, searchUI } = useAuthorsTableData();
   const { columns: pColumns, rows: pRows, searchUI: pSearchUI } = projectsTableData();
 
   return (

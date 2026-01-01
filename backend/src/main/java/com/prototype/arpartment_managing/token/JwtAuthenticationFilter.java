@@ -31,12 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain chain
-    ) throws ServletException, IOException {
+            @NonNull FilterChain chain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
         // If no Authorization header or not a Bearer token, continue with filter chain
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if (request.getRequestURI().startsWith("/user/")) {
+                logger.warn("Missing or invalid Authorization header for URI: {}", request.getRequestURI());
+            }
             chain.doFilter(request, response);
             return;
         }
@@ -57,19 +59,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // Create authorities list with ROLE_ prefix (Spring Security convention)
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                        new SimpleGrantedAuthority("ROLE_" + role)
-                );
+                        new SimpleGrantedAuthority("ROLE_" + role));
 
                 // Create authentication token
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(username, null, authorities);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
+                        authorities);
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 // Set authentication in context
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.debug("Authenticated user: {}, with role: {}", username, role);
+                logger.info("Successfully authenticated user: {} with role: {} for URI: {}", username, role,
+                        request.getRequestURI());
+            } else if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                logger.debug("User already authenticated in context: {}",
+                        SecurityContextHolder.getContext().getAuthentication().getName());
+            } else {
+                logger.warn("JWT token validation failed for URI: {}", request.getRequestURI());
             }
+
         } catch (Exception e) {
             logger.error("Authentication error: {}", e.getMessage());
         }
