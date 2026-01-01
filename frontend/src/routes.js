@@ -109,8 +109,7 @@ const routes = [
       ) : (
         <ApartmentManagement />
       ),
-    hidden: userRole === "USER",
-    hidden: !token,
+    hidden: !token || userRole === "USER",
   },
   {
     type: "collapse",
