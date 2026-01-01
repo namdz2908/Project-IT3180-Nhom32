@@ -33,33 +33,18 @@ function StatisticsTables() {
     overdue: { count: 0, amount: 0 },
   });
 
-  // Mock data – frontend config before backend ready
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Sau này chỉ cần mở comment và chỉnh URL
-        // const res = await axios.get("/dashboard/statistics");
-        // setResidentStats(res.data.residents);
-        // setFinancialStats(res.data.financials);
-
-        setResidentStats({
-          activeResidents: 120,
-          movedOutResidents: 15,
-          totalApartments: 50,
-          apartmentTypes: {
-            Studio: 10,
-            "1 Bedroom": 20,
-            "2 Bedroom": 15,
-            Penthouse: 5,
-          },
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:8080/dashboard/statistics", {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        setFinancialStats({
-          totalInvoices: { count: 200, amount: 50000000 },
-          paid: { count: 180, amount: 45000000 },
-          unpaid: { count: 15, amount: 3000000 },
-          overdue: { count: 5, amount: 2000000 },
-        });
+        const { residents, financials } = response.data;
+
+        setResidentStats(residents);
+        setFinancialStats(financials);
       } catch (error) {
         console.error("Error fetching statistics:", error);
       }
