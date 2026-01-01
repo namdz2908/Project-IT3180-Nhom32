@@ -68,9 +68,9 @@ if (token) {
 const routes = [
   {
     type: "collapse",
-    name: "Welcome",
+    name: userRole === "ADMIN" ? "Statistics" : "Welcome",
     key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
+    icon: <Icon fontSize="small">{userRole === "ADMIN" ? "analytics" : "dashboard"}</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
   },
