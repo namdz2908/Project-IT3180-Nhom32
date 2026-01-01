@@ -1,5 +1,7 @@
 package com.prototype.arpartment_managing.dto;
+
 import com.prototype.arpartment_managing.model.User;
+import java.time.LocalDateTime;
 
 public class UserDTO {
     private Long id;
@@ -11,8 +13,12 @@ public class UserDTO {
     private String citizenIdentification;
     private String password;
     private String apartmentId;
+    private boolean isActive;
+    private LocalDateTime movedOutAt;
 
-    public UserDTO() {}
+    public UserDTO() {
+    }
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.fullName = user.getFullName();
@@ -23,6 +29,8 @@ public class UserDTO {
         this.citizenIdentification = user.getCitizenIdentification();
         this.password = user.getPassword();
         this.apartmentId = (user.getApartment() != null) ? user.getApartment().getApartmentId() : null;
+        this.isActive = user.isActive();
+        this.movedOutAt = user.getMovedOutAt();
     }
 
     public Long getId() {
@@ -95,5 +103,21 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public LocalDateTime getMovedOutAt() {
+        return movedOutAt;
+    }
+
+    public void setMovedOutAt(LocalDateTime movedOutAt) {
+        this.movedOutAt = movedOutAt;
     }
 }

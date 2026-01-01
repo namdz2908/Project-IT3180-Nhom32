@@ -3,10 +3,11 @@ package com.prototype.arpartment_managing.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table( name = "users")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +25,14 @@ public class User {
     private String role;
     @Column(nullable = false, unique = true, name = "citizen_identification")
     private String citizenIdentification;
-    @ManyToOne(fetch = FetchType.EAGER )
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    @Column(name = "moved_out_at")
+    private LocalDateTime movedOutAt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id", nullable = false)
     @JsonBackReference // Only this for bidirectional
     private Apartment apartment;
@@ -96,6 +104,7 @@ public class User {
     public void setCitizenIdentification(String citizenIdentification) {
         this.citizenIdentification = citizenIdentification;
     }
+
     public Apartment getApartment() {
         return apartment;
     }
@@ -110,5 +119,21 @@ public class User {
 
     public void setNotifications(Set<Notification> notifications) {
         this.notifications = notifications;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public LocalDateTime getMovedOutAt() {
+        return movedOutAt;
+    }
+
+    public void setMovedOutAt(LocalDateTime movedOutAt) {
+        this.movedOutAt = movedOutAt;
     }
 }

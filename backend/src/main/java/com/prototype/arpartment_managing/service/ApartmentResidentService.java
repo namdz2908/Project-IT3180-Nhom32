@@ -33,9 +33,11 @@ public class ApartmentResidentService {
 
         // Find the user
         User user = userRepository.findById(userId)
+                .filter(User::isActive)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        // If user already has an apartment, remove from previous apartment's resident list
+        // If user already has an apartment, remove from previous apartment's resident
+        // list
         if (user.getApartment() != null && !user.getApartment().getApartmentId().equals(apartmentId)) {
             removeUserFromPreviousApartment(user);
             // Refresh user after removal
@@ -78,6 +80,7 @@ public class ApartmentResidentService {
 
         // Find the user
         User user = userRepository.findById(userId)
+                .filter(User::isActive)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         // Check if user is assigned to this apartment
@@ -113,6 +116,7 @@ public class ApartmentResidentService {
         if (user.getApartment() == null) {
             Long userId = user.getId();
             User existingUser = userRepository.findById(user.getId())
+                    .filter(User::isActive)
                     .orElseThrow(() -> new UserNotFoundException(userId));
 
             if (existingUser.getApartment() != null) {
@@ -129,6 +133,7 @@ public class ApartmentResidentService {
         // Check if user already in a different apartment
         Long userId = user.getId();
         User existingUser = userRepository.findById(user.getId())
+                .filter(User::isActive)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (existingUser.getApartment() != null &&
@@ -174,13 +179,22 @@ public class ApartmentResidentService {
 
     @Transactional
     public void addResidentToApartmentByCitizenIdentification(String citizenIdentificaition, String apartmentId) {
-        Optional<User> user = userRepository.findByCitizenIdentification(citizenIdentificaition);
+        Optional<User> user = userRepository.findByCitizenIdentification(citizenIdentificaition)
+                .filter(User::isActive);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(0L); // Should probably use a better exception or handling
+        }
         addResidentToApartment(user.get().getId(), apartmentId);
     }
 
     @Transactional
     public void removeResidentFromApartmentByCitizenIdentification(String citizenIdentificaition, String apartmentId) {
-        Optional<User> user = userRepository.findByCitizenIdentification(citizenIdentificaition);
+        Optional<User> user = userRepository.findByCitizenIdentification(citizenIdentificaition)
+                .filter(User::isActive);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException(0L);
+        }
         removeResidentFromApartment(user.get().getId(), apartmentId);
     }
+
 }

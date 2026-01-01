@@ -20,7 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.prototype.arpartment_managing.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
+
 import java.util.stream.Collectors;
 
 @Primary
@@ -40,7 +42,6 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -49,18 +50,23 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-
-    // Get all users
+    // Get all users (only active)
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(UserDTO::new).collect(Collectors.toList());
+        return users.stream()
+                .filter(User::isActive)
+                .map(UserDTO::new)
+                .collect(Collectors.toList());
     }
 
     // Get user by id
-    public ResponseEntity<?> getUser(Long id){
+    public ResponseEntity<?> getUser(Long id) {
         if (id != null) {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new UserNotFoundException(id));
+            if (!user.isActive()) {
+                throw new UserNotFoundException(id);
+            }
             return ResponseEntity.ok(new UserDTO(user));
         } else {
             return ResponseEntity.badRequest().body("Must provide id");
@@ -68,21 +74,26 @@ public class UserService {
     }
 
     // Get user by username
-    public ResponseEntity<?> getUserByUsername(String username){
+    public ResponseEntity<?> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(()-> new UserNotFoundExceptionUsername(username));
+                .filter(User::isActive)
+                .orElseThrow(() -> new UserNotFoundExceptionUsername(username));
         return ResponseEntity.ok(new UserDTO(user));
     }
 
     public List<UserDTO> getUserSameApartment(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new UserNotFoundException(id));
+                .filter(User::isActive)
+                .orElseThrow(() -> new UserNotFoundException(id));
         UserDTO userDTO = new UserDTO(user);
         Optional<Apartment> apartment = apartmentRepository.findByApartmentId(userDTO.getApartmentId());
 
         if (apartment.isPresent()) {
             List<User> users = userRepository.findByApartment(apartment.get());
-            return users.stream().map(UserDTO::new).collect(Collectors.toList());
+            return users.stream()
+                    .filter(User::isActive)
+                    .map(UserDTO::new)
+                    .collect(Collectors.toList());
         }
 
         return Collections.emptyList(); // Trả về danh sách rỗng nếu không tìm thấy apartment
@@ -117,7 +128,8 @@ public class UserService {
 
         Optional<User> existingCI = userRepository.findByCitizenIdentification(userDTO.getCitizenIdentification());
         if (existingCI.isPresent()) {
-            throw new IllegalArgumentException("User with citizen identification '" + userDTO.getCitizenIdentification() + "' already exists");
+            throw new IllegalArgumentException(
+                    "User with citizen identification '" + userDTO.getCitizenIdentification() + "' already exists");
         }
 
         User user = new User();
@@ -145,7 +157,6 @@ public class UserService {
         return user;
     }
 
-
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
         return email != null && email.matches(emailRegex);
@@ -163,11 +174,14 @@ public class UserService {
         return cccd != null && cccd.matches(cccdRegex);
     }
 
-    // Delete user
+    // Soft Delete user
     @Transactional
-    public void deleteUser(Long id){
-        User user = userRepository.findById(id).
-                orElseThrow(()-> new UserNotFoundException(id));
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!user.isActive()) {
+            return; // Already deleted
+        }
 
         // 1. Gỡ liên kết giữa User và Notifications
         Set<Notification> notifications = user.getNotifications();
@@ -177,8 +191,9 @@ public class UserService {
         }
         user.getNotifications().clear(); // gỡ liên kết từ phía user
 
+        // 2. Gỡ liên kết với Apartment và cập nhật số lượng
         Apartment apartment = user.getApartment();
-        if(apartment != null && apartment.getResidents() != null){
+        if (apartment != null && apartment.getResidents() != null) {
             // Remove from list and break relationship
             apartment.getResidents().removeIf(r -> r.getId().equals(id));
             user.setApartment(null);
@@ -188,8 +203,16 @@ public class UserService {
             apartment.setIsOccupied(!apartment.getResidents().isEmpty());
             apartmentRepository.save(apartment);
         }
-        userRepository.deleteById(id);
-        return;
+
+        // 3. Thực hiện Soft Delete và Giải phóng Unique Key
+        user.setActive(false);
+        user.setMovedOutAt(LocalDateTime.now());
+
+        String suffix = "_del_" + System.currentTimeMillis();
+        user.setUsername(user.getUsername() + suffix);
+        user.setCitizenIdentification(user.getCitizenIdentification() + suffix);
+
+        userRepository.save(user);
     }
 
     // Login
@@ -201,7 +224,8 @@ public class UserService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
+            // Chỉ cho phép đăng nhập nếu tài khoản còn hoạt động
+            if (user.isActive() && passwordEncoder.matches(password, user.getPassword())) {
                 String token = jwtUtil.generateToken(username, user.getRole());
                 Map<String, Object> response = new HashMap<>();
                 response.put("id", user.getId());
@@ -219,7 +243,7 @@ public class UserService {
                 .body("Invalid username or password");
     }
 
-    //Register
+    // Register
     public ResponseEntity<?> registerUser(UserDTO userDTO) {
         // Validate required fields
         if (userDTO.getApartmentId() == null || userDTO.getApartmentId().isEmpty()) {
@@ -228,20 +252,23 @@ public class UserService {
         }
 
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("error", "Tên đăng nhập đã tồn tại"));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Tên đăng nhập đã tồn tại"));
         }
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("error", "Email đã được sử dụng"));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Email đã được sử dụng"));
         }
         if (userRepository.findByCitizenIdentification(userDTO.getCitizenIdentification()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("error", "Số CCCD đã được đăng kí"));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("error", "Số CCCD đã được đăng kí"));
         }
         User newUser = createUser(userDTO);
         return ResponseEntity.ok(newUser);
     }
 
     // Transfer userDTO to User
-    public User userDTOtouser(UserDTO userDTO,User user){
+    public User userDTOtouser(UserDTO userDTO, User user) {
         user.setFullName(userDTO.getFullName());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -260,10 +287,12 @@ public class UserService {
 
     // Update user information
     @Transactional
-    public User updateUser(UserDTO userDTO, Long id){
+    public User updateUser(UserDTO userDTO, Long id) {
         // Cập nhật thông tin căn hộ nếu apartmentId thay đổi
         return userRepository.findById(id)
+                .filter(User::isActive)
                 .map(user -> {
+
                     user.setFullName(userDTO.getFullName());
                     user.setUsername(userDTO.getUsername());
                     user.setEmail(userDTO.getEmail());
@@ -282,7 +311,6 @@ public class UserService {
                 }).orElseThrow(() -> new UserNotFoundException(id));
     }
 
-
     @Transactional
     public void removeUserFromPreviousApartment(User user) {
         Apartment previousApartment = user.getApartment();
@@ -295,7 +323,8 @@ public class UserService {
     }
 
     public Apartment getApartmentofUser(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
+        Optional<User> userOptional = userRepository.findById(id)
+                .filter(User::isActive);
 
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException(id);
@@ -327,12 +356,14 @@ public class UserService {
     }
 
     public boolean isUsernameMatchingEmail(String username, String email) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
+        Optional<User> userOpt = userRepository.findByUsername(username)
+                .filter(User::isActive);
         return userOpt.isPresent() && userOpt.get().getEmail().equals(email);
     }
 
     public boolean changePassword(String username, String newPassword) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
+        Optional<User> optionalUser = userRepository.findByUsername(username)
+                .filter(User::isActive);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
