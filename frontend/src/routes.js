@@ -76,6 +76,24 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Apartment Management",
+    key: "apartment-management",
+    icon: <Icon fontSize="small">apartment</Icon>,
+    route: "/manage/apartment",
+    component:
+      userRole === "USER" ? (
+        () => (
+          <div style={{ padding: 32, fontSize: 24 }}>
+            You don&apos;t have permission to access this
+          </div>
+        )
+      ) : (
+        <ApartmentManagement />
+      ),
+    hidden: !token || userRole === "USER",
+  },
+  {
+    type: "collapse",
     name: "Resident Management",
     key: "tables",
     icon: <Icon fontSize="small">people</Icon>,
@@ -92,24 +110,6 @@ const routes = [
       ),
     hidden: userRole === "USER",
     hidden: !token,
-  },
-  {
-    type: "collapse",
-    name: "Apartment Management",
-    key: "apartment-management",
-    icon: <Icon fontSize="small">apartment</Icon>,
-    route: "/manage/apartment",
-    component:
-      userRole === "USER" ? (
-        () => (
-          <div style={{ padding: 32, fontSize: 24 }}>
-            You don&apos;t have permission to access this
-          </div>
-        )
-      ) : (
-        <ApartmentManagement />
-      ),
-    hidden: !token || userRole === "USER",
   },
   {
     type: "collapse",
@@ -203,15 +203,15 @@ const routes = [
     route: "/payment/complete/:paymentToken",
     component: <PaymentComplete />,
   },
-  {
-    type: "collapse",
-    name: "Contribution",
-    key: "contribution",
-    icon: <Icon fontSize="small">monetization_on</Icon>,
-    route: "/contribution",
-    component: <UserContributionTable />,
-    hidden: !token,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Contribution",
+  //   key: "contribution",
+  //   icon: <Icon fontSize="small">monetization_on</Icon>,
+  //   route: "/contribution",
+  //   component: <UserContributionTable />,
+  //   hidden: !token,
+  // },
   // {
   //   type: "collapse",
   //   name: "Sign Up",
