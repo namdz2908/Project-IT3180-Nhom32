@@ -56,8 +56,8 @@ function StatisticsTables() {
   // Residents & Apartments table
   const residentColumns = [
     { Header: "Metric", accessor: "metric", width: "40%", align: "left" },
-    { Header: "Count", accessor: "count", width: "30%", align: "center" },
-    { Header: "Details", accessor: "details", width: "30%", align: "left" },
+    { Header: "Count", accessor: "count", width: "20%", align: "center" },
+    { Header: "Details", accessor: "details", width: "40%", align: "right" },
   ];
 
   const residentRows = [
@@ -82,9 +82,9 @@ function StatisticsTables() {
 
   // Financial statistics table
   const financialColumns = [
-    { Header: "Status", accessor: "status", width: "30%", align: "left" },
+    { Header: "Status", accessor: "status", width: "40%", align: "left" },
     { Header: "Count", accessor: "count", width: "20%", align: "center" },
-    { Header: "Amount (VND)", accessor: "amount", width: "50%", align: "right" },
+    { Header: "Amount (VND)", accessor: "amount", width: "40%", align: "right" },
   ];
 
   const financialRows = [
@@ -152,7 +152,7 @@ function StatisticsTables() {
         </Grid>
 
         {/* Financial Statistics */}
-        <Grid item xs={12} mt={3}>
+        <Grid item xs={12} mt={3} pb={10}>
           <Card>
             <MDBox
               mx={2}
