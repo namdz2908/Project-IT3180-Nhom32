@@ -43,6 +43,7 @@ cd Project-IT3180-Nhom32
    * Trong MySQL Workbench, vào mục **File** -> **Open SQL Script**.
    * Chọn file `database/init_test_data.sql` nằm trong thư mục gốc của dự án.
    * Nhấn nút **Execute** (hình tia sét) để tạo Database và thêm các bản ghi mẫu (Căn hộ & Người dùng).
+   * Lưu ý: Nếu thêm dữ liệu trực tiếp trong db thì phải tự set lại ocupants của các căn hộ trên giao diện
 4. Cấu hình thông tin kết nối trong file `backend/src/main/resources/application.properties` để khớp với máy của bạn:
    ```properties
    # Đảm bảo URL trỏ đúng về localhost:3306 và tên Schema bạn đã tạo
