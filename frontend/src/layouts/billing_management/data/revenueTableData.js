@@ -124,8 +124,8 @@ export default function revenueData() {
 
   const handleDeleteClick = (item) => {
     setSelectedRevenue(item);
-    console.log("Selected Revenue:", item);
-    console.log("Selected Revenue ID:", selectedRevenue);
+    console.log("Selected Invoice:", item);
+    console.log("Selected Invoice ID:", selectedRevenue);
     setDeleteDialogOpen(true);
   };
 
@@ -134,12 +134,12 @@ export default function revenueData() {
       await axios.delete(`http://localhost:8080/revenue/delete?id=${selectedRevenue.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      alert("Delete revenue successfully!");
+      alert("Delete invoice successfully!");
       setDeleteDialogOpen(false);
       loadRevenues();
     } catch (err) {
-      console.error("Failed to delete revenue", err);
-      alert("Failed to delete revenue. Please try again!");
+      console.error("Failed to delete invoice", err);
+      alert("Failed to delete invoice. Please try again!");
     }
   };
 
@@ -156,7 +156,7 @@ export default function revenueData() {
       used: "",
       endDate: "",
     });
-    console.log("Create Revenue:", newRevenue);
+    console.log("Create Invoice:", newRevenue);
     setCreateDialogOpen(true);
   };
 
@@ -180,29 +180,29 @@ export default function revenueData() {
           ...newRevenue,
           apartmentId: id,
         };
-        console.log("newconvertedRevenue:", converted);
+        console.log("newconvertedInvoice:", converted);
         await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
-      alert("Create revenue successfully!");
+      alert("Create invoice successfully!");
       loadRevenues();
       handleCreateClose();
     } catch (error) {
-      console.error("Failed to create Revenue", error);
-      alert("Failed to create revenue. Please try again!");
+      console.error("Failed to create Invoice", error);
+      alert("Failed to create invoice. Please try again!");
     }
   };
 
   useEffect(() => {
-    console.log("Edit Revenue đã thay đổi:", editRevenue);
+    console.log("Edit Invoice đã thay đổi:", editRevenue);
   }, [editRevenue]);
 
   const handleEditClick = (item) => {
     console.log("click nay");
     console.log("Bill Data:", item);
     setEditRevenue(item);
-    console.log("Edit Revenue:", editRevenue);
+    console.log("Edit Invoice:", editRevenue);
     setEditDialogOpen(true);
   };
 
@@ -222,12 +222,12 @@ export default function revenueData() {
       await axios.put(`http://localhost:8080/revenue/${editRevenue.id}`, editRevenue, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      alert("Edit revenue successfully!");
+      alert("Edit invoice successfully!");
       loadRevenues();
       handleEditClose();
     } catch (error) {
-      console.error("Failed to update revenue", error);
-      alert("Failed to edit revenue. Please try again!");
+      console.error("Failed to update invoice", error);
+      alert("Failed to edit invoice. Please try again!");
     }
   };
 
@@ -396,7 +396,7 @@ export default function revenueData() {
             },
           }}
         >
-          <Icon>add</Icon> Create Revenue
+          <Icon>add</Icon> Create Invoice
         </MDButton>
         <MDBox mr={1}>
           <select
@@ -544,7 +544,7 @@ export default function revenueData() {
       </Dialog>
       {/* Delete Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Revenue</DialogTitle>
+        <DialogTitle>Delete Invoice</DialogTitle>
         <DialogContent>
           <MDTypography>
             Are you sure you want to delete the fee &quot;{selectedRevenue?.type}&quot;?

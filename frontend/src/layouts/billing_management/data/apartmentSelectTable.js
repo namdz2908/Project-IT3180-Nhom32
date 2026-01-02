@@ -71,7 +71,7 @@ function ApartmentSelectTable({ selectedApartments, setSelectedApartments }) {
                   Apartment Select Table
                 </MDTypography>
                 <MDTypography variant="button" color="white" opacity={0.8}>
-                  Select apartments to revenue
+                  Select apartments to add invoice
                 </MDTypography>
               </MDBox>
             </MDBox>

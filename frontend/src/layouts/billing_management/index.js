@@ -120,10 +120,10 @@ function BillingTable() {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <Icon sx={{ mr: 1 }}>receipt_long</Icon>
-                    Revenue Table
+                    Invoice Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage all revenues
+                    Manage all invoices
                   </MDTypography>
                 </MDBox>
               </MDBox>
