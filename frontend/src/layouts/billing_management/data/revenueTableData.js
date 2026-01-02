@@ -499,7 +499,7 @@ export default function revenueData() {
               >
                 <option value="Unpaid">Unpaid</option>
                 <option value="Paid">Paid</option>
-                <option value="Overdue">Overdue</option>
+                {/* <option value="Overdue">Overdue</option> */}
               </select>
             </MDBox>
             {/* <MDInput
