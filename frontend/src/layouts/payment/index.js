@@ -27,7 +27,7 @@ export default function PaymentComplete() {
     const fetchPaymentDetails = async () => {
       try {
         console.log("paymentToken trong paymentComplete là: ", paymentToken);
-        const response = await axios.get(`${API_URL}/revenue/getPayment/${paymentToken}`, {
+        const response = await axios.get(`${API_URL}/invoices/getPayment/${paymentToken}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         setPaymentData(response.data); // Lưu thông tin giao dịch
@@ -82,7 +82,7 @@ export default function PaymentComplete() {
                 onClick={async () => {
                   try {
                     const response = await axios.get(
-                      `http://localhost:8080/revenue/complete-payment/${paymentToken}`,
+                      `http://localhost:8080/invoices/complete-payment/${paymentToken}`,
                       {
                         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                       }

@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Revenues")
-public class Revenue {
+@Table(name = "invoices")
+public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +41,7 @@ public class Revenue {
     private String paymentToken;
 
     // Constructor to set createDate automatically
-    public Revenue() {
+    public Invoice() {
         this.createDate = LocalDateTime.now();
         this.status = "Unpaid"; // Default status
     }
@@ -123,6 +123,7 @@ public class Revenue {
     public LocalDateTime getPaidDate() {
         return paidDate;
     }
+
     public void setPaidDate(LocalDateTime paidDate) {
         this.paidDate = paidDate;
     }
@@ -135,11 +136,11 @@ public class Revenue {
         this.paymentToken = paymentToken;
     }
 
-    // Method to check if revenue is overdue
+    // Method to check if invoice is overdue
     public boolean isOverdue() {
-        return endDate != null && 
-               LocalDateTime.now().isAfter(endDate) && 
-               "Unpaid".equals(status);
+        return endDate != null &&
+                LocalDateTime.now().isAfter(endDate) &&
+                "Unpaid".equals(status);
     }
 
     // Method to update status based on payment and due date

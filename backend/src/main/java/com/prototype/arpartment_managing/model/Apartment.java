@@ -23,43 +23,41 @@ public class Apartment {
     @Column(name = "apartmentType")
     private String apartmentType;
     @Column(name = "owner")
-    private String owner;    
+    private String owner;
     @Column(name = "occupants")
     private Integer occupants = 0;
 
     @Column(name = "is_occupied")
     private Boolean isOccupied = false;
-    
+
     @Column(name = "service_usage")
     private Double serviceUsage = 0.0;
-    
+
     @Column(name = "water_usage")
     private Double waterUsage = 0.0;
-    
+
     @Column(name = "electricity_usage")
     private Double electricityUsage = 0.0;
-    
+
     @Column(name = "vehicle_count")
     private Integer vehicleCount = 0;
 
-    @OneToMany(mappedBy = "apartment", cascade = { CascadeType.ALL},
-            fetch = FetchType.LAZY, orphanRemoval = false)
+    @OneToMany(mappedBy = "apartment", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, orphanRemoval = false)
     @JsonIgnore
     private List<User> residents;
 
-    @OneToMany(mappedBy = "apartment", cascade = { CascadeType.ALL},
-            fetch = FetchType.LAZY, orphanRemoval = false)
+    @OneToMany(mappedBy = "apartment", cascade = { CascadeType.ALL }, fetch = FetchType.LAZY, orphanRemoval = false)
     @JsonIgnore
-    private List<Revenue> revenues;
+    private List<Invoice> invoices;
 
-    @Column( name = "total" )
+    @Column(name = "total")
     private Double total;
 
     // Constructors
     public Apartment() {
     }
 
-    public Apartment(String apartmentId){
+    public Apartment(String apartmentId) {
 
     }
 
@@ -95,6 +93,7 @@ public class Apartment {
     public void setArea(Float area) {
         this.area = area;
     }
+
     public String getApartmentType() {
         return apartmentType;
     }
@@ -121,43 +120,44 @@ public class Apartment {
 
     public Boolean getIsOccupied() {
         return isOccupied;
-    }    
+    }
+
     public void setIsOccupied(Boolean isOccupied) {
         this.isOccupied = isOccupied;
     }
-    
+
     public Double getServiceUsage() {
         return serviceUsage;
     }
-    
+
     public void setServiceUsage(Double serviceUsage) {
         this.serviceUsage = serviceUsage;
     }
-    
+
     public Double getWaterUsage() {
         return waterUsage;
     }
-    
+
     public void setWaterUsage(Double waterUsage) {
         this.waterUsage = waterUsage;
     }
-    
+
     public Double getElectricityUsage() {
         return electricityUsage;
     }
-    
+
     public void setElectricityUsage(Double electricityUsage) {
         this.electricityUsage = electricityUsage;
     }
-    
+
     public Integer getVehicleCount() {
         return vehicleCount;
     }
-    
+
     public void setVehicleCount(Integer vehicleCount) {
         this.vehicleCount = vehicleCount;
     }
-    
+
     public List<User> getResidents() {
         return residents;
     }
@@ -166,21 +166,21 @@ public class Apartment {
         this.residents = residents;
     }
 
-    public List<Revenue> getRevenues() {
-        return revenues;
+    public List<Invoice> getInvoices() {
+        return invoices;
     }
 
-    public Revenue getRevenueById(String id){
-        for(Revenue rev : revenues){
-            if(rev.getId().toString().equals(id)){
-                return rev;
+    public Invoice getInvoiceById(String id) {
+        for (Invoice inv : invoices) {
+            if (inv.getId().toString().equals(id)) {
+                return inv;
             }
         }
         return null;
     }
 
-    public void setRevenues(List<Revenue> revenues) {
-        this.revenues = revenues;
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     public Double getTotal() {
@@ -191,33 +191,32 @@ public class Apartment {
         this.total = total;
     }
 
-    public List<Revenue> getRevenueWithStatusOrId(String status, String id) {
+    public List<Invoice> getInvoiceWithStatusOrId(String status, String id) {
         System.out.println("status is " + status);
         System.out.println("id is " + id);
-        List<Revenue> revenues = new ArrayList<Revenue>();
-        if(status != null){
-            for(Revenue revenue : this.getRevenues()){
-                if(revenue.getStatus().equals(status)){
-                    revenues.add(revenue);
+        List<Invoice> invoices = new ArrayList<Invoice>();
+        if (status != null) {
+            for (Invoice invoice : this.getInvoices()) {
+                if (invoice.getStatus().equals(status)) {
+                    invoices.add(invoice);
                 }
             }
-        }
-        else {
-            List<Revenue> re = this.getRevenues();
-            Revenue revenue = null;
-            for(Revenue rev : re){
-                if(rev.getId().toString().equals(id)){
-                    revenue = rev;
+        } else {
+            List<Invoice> invList = this.getInvoices();
+            Invoice invoice = null;
+            for (Invoice inv : invList) {
+                if (inv.getId().toString().equals(id)) {
+                    invoice = inv;
                     break;
                 }
             }
-            if(revenue == null){
+            if (invoice == null) {
                 System.out.print("NULL ROI CHAY LAM GI NUA: ");
                 return null;
             }
-            revenues.add(revenue);
+            invoices.add(invoice);
         }
 
-        return revenues;
+        return invoices;
     }
 }

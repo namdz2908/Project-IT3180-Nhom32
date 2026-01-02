@@ -4,22 +4,22 @@ const API_URL = "http://localhost:8080";
 
 // lấy danh sách hóa đơn
 export const getAllInvoices = async () => {
-  const response = await axios.get(`${API_URL}/revenue/all`, {
+  const response = await axios.get(`${API_URL}/invoices/all`, {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   return response.data;
 };
 
 // lấy hóa đơn theo apartmentId
-export const getRevenue = async (id = null) => {
+export const getInvoice = async (id = null) => {
   try {
-    const response = await axios.get(`${API_URL}/revenue/${id}`, {
+    const response = await axios.get(`${API_URL}/invoices/${id}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     console.log("response la: ---------------------", response.data);
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+    console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
     return null;
   }
 };
@@ -32,69 +32,69 @@ export const getFeeByType = async (type = null) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+    console.error("Lỗi khi lấy dữ liệu fee:", error);
     return null;
   }
 };
 
-// cập nhật tổng doanh thu căn hộ
-export const updateTotalRevenueOfApartment = async (apartmentId) => {
+// cập nhật tổng hóa đơn căn hộ
+export const updateTotalInvoiceOfApartment = async (apartmentId) => {
   try {
     const response = await axios.put(`${API_URL}/apartment/${apartmentId}/total`, null, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi cập nhật doanh thu của căn hộ:", error);
+    console.error("Lỗi khi cập nhật tổng hóa đơn của căn hộ:", error);
     return null;
   }
 };
 
-// Cập nhật thông tin doanh thu
-export const updateRevenue = async (id, revenueDTO) => {
+// Cập nhật thông tin hóa đơn
+export const updateInvoice = async (id, invoiceDTO) => {
   try {
-    const response = await axios.put(`${API_URL}/revenue/${id}`, revenueDTO, {
+    const response = await axios.put(`${API_URL}/invoices/${id}`, invoiceDTO, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi cập nhật doanh thu:", error);
+    console.error("Lỗi khi cập nhật hóa đơn:", error);
     return null;
   }
 };
 
 // lấy hóa đơn theo apartmentID và type
-export const getRevenueByApartmentAndType = async (apartmentId = null, type = null) => {
+export const getInvoiceByApartmentAndType = async (apartmentId = null, type = null) => {
   try {
-    const response = await axios.get(`${API_URL}/revenue`, {
+    const response = await axios.get(`${API_URL}/invoices`, {
       params: apartmentId && type ? { apartmentId, type } : {},
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+    console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
     return null;
   }
 };
 
 // tạo hóa đơn mới
-export const createRevenue = async (revenueDTO) => {
-  const response = await axios.post(`${API_URL}/revenue`, revenueDTO, {
+export const createInvoice = async (invoiceDTO) => {
+  const response = await axios.post(`${API_URL}/invoices`, invoiceDTO, {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });
   return response.data;
 };
 
 // Xóa hóa đơn theo id
-export const deleteRevenue = async (id) => {
+export const deleteInvoice = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/delete`, {
+    const response = await axios.delete(`${API_URL}/invoices/delete`, {
       params: { id },
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi xóa doanh thu:", error);
+    console.error("Lỗi khi xóa hóa đơn:", error);
     return null;
   }
 };
@@ -103,7 +103,7 @@ export const deleteRevenue = async (id) => {
 export const QRcode = async (paymentToken) => {
   console.log("paymentToken trong api.js la : ---------------------", paymentToken);
   try {
-    const response = await axios.get(`${API_URL}/revenue/getQRCode/${paymentToken}`, {
+    const response = await axios.get(`${API_URL}/invoices/getQRCode/${paymentToken}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     console.log("response la: ---------------------", response.data);
@@ -138,7 +138,7 @@ export const createPDF = async (apartmentId, id, isQR) => {
 // Thanh toán hóa đơn
 export const payBill = async (paymentToken) => {
   try {
-    const response = await axios.put(`${API_URL}/revenue/complete-payment/${paymentToken}`);
+    const response = await axios.put(`${API_URL}/invoices/complete-payment/${paymentToken}`);
     return response.data;
   } catch (error) {
     console.error("Lỗi khi thanh toán:", error);
@@ -149,38 +149,38 @@ export const payBill = async (paymentToken) => {
 // Lấy contribution qua apartmentId
 export const getContribution = async (apartmentId) => {
   try {
-    const response = await axios.get(`${API_URL}/revenue/contribution/${apartmentId}`, {
+    const response = await axios.get(`${API_URL}/invoices/contribution/${apartmentId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+    console.error("Lỗi khi lấy dữ liệu contribution:", error);
     return null;
   }
 };
 
-export const getRevenueNotContribution = async (apartmentId) => {
+export const getInvoiceNotContribution = async (apartmentId) => {
   try {
-    const response = await axios.get(`${API_URL}/revenue/not-contribution/${apartmentId}`, {
+    const response = await axios.get(`${API_URL}/invoices/not-contribution/${apartmentId}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu doanh thu:", error);
+    console.error("Lỗi khi lấy dữ liệu hóa đơn:", error);
     return null;
   }
 };
 
-//  THÊM VÀO CUỐI FILE (trước function cuối cùng)
-export const getUpcomingRevenues = async (daysAhead = 7) => {
+// Lấy danh sách hóa đơn sắp đến hạn
+export const getUpcomingInvoices = async (daysAhead = 7) => {
   try {
-    const response = await axios.get(`${API_URL}/revenue/upcoming`, {
+    const response = await axios.get(`${API_URL}/invoices/upcoming`, {
       params: { daysAhead },
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi lấy revenues sắp đến hạn:", error);
+    console.error("Lỗi khi lấy invoices sắp đến hạn:", error);
     return [];
   }
 };

@@ -2,12 +2,12 @@ package com.prototype.arpartment_managing.dto;
 
 import com.prototype.arpartment_managing.exception.ApartmentNotFoundException;
 import com.prototype.arpartment_managing.model.Apartment;
-import com.prototype.arpartment_managing.model.Revenue;
+import com.prototype.arpartment_managing.model.Invoice;
 import com.prototype.arpartment_managing.repository.ApartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 
-public class RevenueDTO {
+public class InvoiceDTO {
 
     private ApartmentRepository apartmentRepository;
     private long id;
@@ -21,47 +21,47 @@ public class RevenueDTO {
     private double used;
 
     private double total;
-    
+
     private LocalDateTime createDate;
-    
+
     private LocalDateTime endDate;
 
-    private String dueDate;        // Thêm ISO string cho frontend
-    
-    private String apartmentName;  // Thêm Tên căn hộ
-    
+    private String dueDate; // Thêm ISO string cho frontend
+
+    private String apartmentName; // Thêm Tên căn hộ
+
     // Constructor without dependencies
-    public RevenueDTO() {
+    public InvoiceDTO() {
     }
-    
-    // Constructor that takes a Revenue and Apartment
-    public RevenueDTO(Revenue revenue, Apartment apartment) {
-        this.id = revenue.getId();
-        this.type = revenue.getType();
-        this.status = revenue.getStatus();
-        this.apartmentId = (revenue.getApartment() != null) ? revenue.getApartment().getApartmentId() : null;
-        
+
+    // Constructor that takes an Invoice and Apartment
+    public InvoiceDTO(Invoice invoice, Apartment apartment) {
+        this.id = invoice.getId();
+        this.type = invoice.getType();
+        this.status = invoice.getStatus();
+        this.apartmentId = (invoice.getApartment() != null) ? invoice.getApartment().getApartmentId() : null;
+
         // Calculate used value based on type
         if ("Service".equals(this.type) && apartment != null) {
             this.used = apartment.getArea();
         } else {
-            this.used = revenue.getUsed();
+            this.used = invoice.getUsed();
         }
-        this.total = revenue.getTotal();
-        this.createDate = revenue.getCreateDate();
-        this.endDate = revenue.getEndDate();
+        this.total = invoice.getTotal();
+        this.createDate = invoice.getCreateDate();
+        this.endDate = invoice.getEndDate();
 
         // THÊM 2 DÒNG NÀY
         this.dueDate = (this.endDate != null) ? this.endDate.toString() : null;
         this.apartmentName = (apartment != null) ? apartment.getApartmentId() : "Unknown";
     }
 
-    public String getDueDate() { 
-        return dueDate; 
+    public String getDueDate() {
+        return dueDate;
     }
 
-    public void setDueDate(String dueDate) { 
-        this.dueDate = dueDate; 
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
     }
 
     public long getId() {

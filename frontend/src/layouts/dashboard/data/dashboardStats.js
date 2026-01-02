@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/revenue/statistics";
+const API_URL = "http://localhost:8080/invoices/statistics";
 
 export const getDashboardStats = async (token) => {
   try {

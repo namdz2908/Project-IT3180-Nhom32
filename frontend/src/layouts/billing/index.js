@@ -27,12 +27,12 @@ import MasterCard from "examples/Cards/MasterCard";
 import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 import Avatar from "@mui/material/Avatar";
 // Billing page components
-import AddRevenue from "layouts/billing/components/add-bill";
+import AddInvoice from "layouts/billing/components/add-bill";
 import Invoices from "layouts/billing/components/Invoices";
 import BillingInformation from "layouts/billing/components/BillingInformation";
 import Calendar from "layouts/billing/components/calendar";
 import { useState, useEffect } from "react";
-import { getUpcomingRevenues } from "./api";
+import { getUpcomingInvoices } from "./api";
 import Icon from "@mui/material/Icon";
 import MDTypography from "components/MDTypography";
 import DataTable from "examples/Tables/DataTable";
@@ -41,22 +41,22 @@ import PaidBills from "layouts/billing/components/PaidBills";
 import ContributionInformation from "./components/ContributionInformation";
 
 function Billing() {
-  const [revenues, setRevenues] = useState([]);
+  const [Invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchRevenues = async () => {
+    const fetchInvoices = async () => {
       try {
         setLoading(true);
-        const data = await getUpcomingRevenues(7);
-        setRevenues(data);
+        const data = await getUpcomingInvoices(7);
+        setInvoices(data);
       } catch (error) {
-        console.error("Lỗi fetch revenues:", error);
+        console.error("Lỗi fetch Invoices:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchRevenues();
+    fetchInvoices();
   }, []);
 
   return (
@@ -89,7 +89,7 @@ function Billing() {
                   </Grid>
                 </Grid> */}
                 {/* <Grid item xs={12}>
-                  <AddRevenue />
+                  <AddInvoice />
                 </Grid> */}
                 <Grid item xs={12}>
                   <Card>
@@ -130,7 +130,7 @@ function Billing() {
               </Grid>
             </Grid>
             <Grid item xs={12} lg={4}>
-              <Calendar revenues={revenues} daysAhead={7} />
+              <Calendar Invoices={Invoices} daysAhead={7} />
               <PaidBills />
             </Grid>
           </Grid>

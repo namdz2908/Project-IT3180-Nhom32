@@ -8,7 +8,7 @@ import MDButton from "components/MDButton";
 import Invoice from "layouts/billing/components/Invoice";
 
 // import api from "services/api";
-import { getAllInvoices, getRevenue } from "../../api"; // Import API
+import { getAllInvoices, getInvoice } from "../../api"; // Import API
 function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // State for input value
@@ -16,7 +16,7 @@ function Invoices() {
   const userId = localStorage.getItem("apartmentId") || 3333;
   useEffect(() => {
     if (userId) {
-      getRevenue(userId).then((data) => {
+      getInvoice(userId).then((data) => {
         if (data) {
           setInvoices(data);
           console.log(data);

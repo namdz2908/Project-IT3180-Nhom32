@@ -13,18 +13,18 @@ import MDInput from "components/MDInput";
 //ApartmentSelectTable
 import ApartmentSelectTable from "layouts/billing_management/data/apartmentSelectTable";
 
-export default function revenueData() {
+export default function InvoiceData() {
   const [fees, setFees] = useState([]);
   const [feeTypes, setFeeTypes] = useState([]);
-  const [revenues, setRevenues] = useState([]);
+  const [Invoices, setInvoices] = useState([]);
   const [rows, setRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   // const [searchTerm, setsearchTerm] = useState("apartmentId");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedRevenue, setSelectedRevenue] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [filteredRevenue, setFilteredRevenue] = useState([]);
+  const [filteredInvoice, setFilteredInvoice] = useState([]);
   const [createError, setCreateError] = useState("");
   const [selectedApartments, setSelectedApartments] = useState(new Set());
   const formatCurrency = (amount) => new Intl.NumberFormat("vi-VN").format(amount) + " VND";
@@ -40,7 +40,7 @@ export default function revenueData() {
   //   });
   // };
 
-  const [newRevenue, setNewRevenue] = useState({
+  const [newInvoice, setNewInvoice] = useState({
     type: "",
     status: "Unpaid",
     used: "",
@@ -50,7 +50,7 @@ export default function revenueData() {
     overdue: "",
   });
 
-  const [editRevenue, setEditRevenue] = useState({
+  const [editInvoice, setEditInvoice] = useState({
     type: "",
     status: "",
     used: "",
@@ -77,11 +77,11 @@ export default function revenueData() {
     }
   };
 
-  const loadRevenues = async () => {
+  const loadInvoices = async () => {
     const data = await getAllInvoices();
     // const filteredData = handleSearch(data)
-    setRevenues(data);
-    setFilteredRevenue(data);
+    setInvoices(data);
+    setFilteredInvoice(data);
     const formattedRows = data.map((bill, index) => ({
       id: ++index,
       type: (
@@ -123,46 +123,46 @@ export default function revenueData() {
   };
 
   const handleDeleteClick = (item) => {
-    setSelectedRevenue(item);
-    console.log("Selected Revenue:", item);
-    console.log("Selected Revenue ID:", selectedRevenue);
+    setSelectedInvoice(item);
+    console.log("Selected Invoice:", item);
+    console.log("Selected Invoice ID:", selectedInvoice);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:8080/revenue/delete?id=${selectedRevenue.id}`, {
+      await axios.delete(`http://localhost:8080/Invoice/delete?id=${selectedInvoice.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      alert("Delete revenue successfully!");
+      alert("Delete Invoice successfully!");
       setDeleteDialogOpen(false);
-      loadRevenues();
+      loadInvoices();
     } catch (err) {
-      console.error("Failed to delete revenue", err);
-      alert("Failed to delete revenue. Please try again!");
+      console.error("Failed to delete Invoice", err);
+      alert("Failed to delete Invoice. Please try again!");
     }
   };
 
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
-    setSelectedRevenue(null);
+    setSelectedInvoice(null);
   };
 
   const handleCreateClick = () => {
     loadFees();
-    setNewRevenue({
+    setNewInvoice({
       type: feeTypes[0] || "",
       status: "Unpaid",
       used: "",
       endDate: "",
     });
-    console.log("Create Revenue:", newRevenue);
+    console.log("Create Invoice:", newInvoice);
     setCreateDialogOpen(true);
   };
 
   const handleCreateClose = () => {
     setCreateDialogOpen(false);
-    setNewRevenue({
+    setNewInvoice({
       type: "",
       status: "",
       used: "",
@@ -173,42 +173,42 @@ export default function revenueData() {
 
   const handleCreateSubmit = async () => {
     try {
-      newRevenue.endDate = new Date(newRevenue.endDate).toISOString();
+      newInvoice.endDate = new Date(newInvoice.endDate).toISOString();
       //Đoạn sửa
       for (const id of selectedApartments) {
         const converted = {
-          ...newRevenue,
+          ...newInvoice,
           apartmentId: id,
         };
-        console.log("newconvertedRevenue:", converted);
-        await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
+        console.log("newconvertedInvoice:", converted);
+        await axios.post("http://localhost:8080/Invoice/create-with-qr", converted, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
       }
-      alert("Create revenue successfully!");
-      loadRevenues();
+      alert("Create Invoice successfully!");
+      loadInvoices();
       handleCreateClose();
     } catch (error) {
-      console.error("Failed to create Revenue", error);
-      alert("Failed to create revenue. Please try again!");
+      console.error("Failed to create Invoice", error);
+      alert("Failed to create Invoice. Please try again!");
     }
   };
 
   useEffect(() => {
-    console.log("Edit Revenue đã thay đổi:", editRevenue);
-  }, [editRevenue]);
+    console.log("Edit Invoice đã thay đổi:", editInvoice);
+  }, [editInvoice]);
 
   const handleEditClick = (item) => {
     console.log("click nay");
     console.log("Bill Data:", item);
-    setEditRevenue(item);
-    console.log("Edit Revenue:", editRevenue);
+    setEditInvoice(item);
+    console.log("Edit Invoice:", editInvoice);
     setEditDialogOpen(true);
   };
 
   const handleEditClose = () => {
     setEditDialogOpen(false);
-    setEditRevenue({
+    setEditInvoice({
       type: "",
       status: "",
       used: "",
@@ -219,26 +219,26 @@ export default function revenueData() {
 
   const handleEditSubmit = async () => {
     try {
-      await axios.put(`http://localhost:8080/revenue/${editRevenue.id}`, editRevenue, {
+      await axios.put(`http://localhost:8080/Invoice/${editInvoice.id}`, editInvoice, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      alert("Edit revenue successfully!");
-      loadRevenues();
+      alert("Edit Invoice successfully!");
+      loadInvoices();
       handleEditClose();
     } catch (error) {
-      console.error("Failed to update revenue", error);
-      alert("Failed to edit revenue. Please try again!");
+      console.error("Failed to update Invoice", error);
+      alert("Failed to edit Invoice. Please try again!");
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewRevenue((prev) => ({ ...prev, [name]: value }));
+    setNewInvoice((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
-    setEditRevenue((prev) => ({ ...prev, [name]: value }));
+    setEditInvoice((prev) => ({ ...prev, [name]: value }));
   };
 
   const columns = [
@@ -260,16 +260,16 @@ export default function revenueData() {
   };
 
   useEffect(() => {
-    loadRevenues();
+    loadInvoices();
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    filterRevenue();
+    filterInvoice();
   };
 
   useEffect(() => {
-    const formattedRows = filteredRevenue.map((bill, index) => ({
+    const formattedRows = filteredInvoice.map((bill, index) => ({
       id: ++index,
       type: (
         <MDTypography variant="button" fontWeight="medium">
@@ -306,12 +306,12 @@ export default function revenueData() {
       ),
     }));
     setRows(formattedRows);
-  }, [filteredRevenue]);
+  }, [filteredInvoice]);
 
-  const filterRevenue = () => {
+  const filterInvoice = () => {
     const normalizedSearchTerm = searchTerm.toString().toLowerCase().trim();
 
-    const filtered = revenues.filter((rev) => {
+    const filtered = Invoices.filter((rev) => {
       if (searchType === "status") {
         return rev.status?.toString().toLowerCase() === normalizedSearchTerm;
       } else if (searchType === "apartmentId") {
@@ -321,7 +321,7 @@ export default function revenueData() {
       }
     });
 
-    setFilteredRevenue(filtered);
+    setFilteredInvoice(filtered);
     const formattedRows = filtered.map((bill, index) => ({
       id: ++index,
       type: (
@@ -396,7 +396,7 @@ export default function revenueData() {
             },
           }}
         >
-          <Icon>add</Icon> Create Revenue
+          <Icon>add</Icon> Create Invoice
         </MDButton>
         <MDBox mr={1}>
           <select
@@ -455,7 +455,7 @@ export default function revenueData() {
           color="dark"
           onClick={() => {
             setSearchTerm("");
-            loadRevenues();
+            loadInvoices();
           }}
           sx={{
             ml: 1,
@@ -471,20 +471,20 @@ export default function revenueData() {
       </MDBox>
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onClose={handleEditClose}>
-        <DialogTitle>Edit Revenue</DialogTitle>
+        <DialogTitle>Edit Invoice</DialogTitle>
         <DialogContent>
           <MDBox display="flex" flexDirection="column" gap={2} mt={1}>
             <MDInput
               label="Type"
               name="type"
-              value={editRevenue.type}
+              value={editInvoice.type}
               onChange={handleEditInputChange}
               fullWidth
             />
             <MDBox fullWidth label="Status">
               <select
                 name="status"
-                value={editRevenue.status}
+                value={editInvoice.status}
                 onChange={handleEditInputChange}
                 style={{
                   height: "42px",
@@ -505,21 +505,21 @@ export default function revenueData() {
             {/* <MDInput
               label="Price Per Unit"
               name="pricePerUnit"
-              value={editRevenue.pricePerUnit}
+              value={editInvoice.pricePerUnit}
               onChange={handleEditInputChange}
               fullWidth
             /> */}
             <MDInput
               label="Units Used"
               name="used"
-              value={editRevenue.used}
+              value={editInvoice.used}
               onChange={handleEditInputChange}
               fullWidth
             />
             <MDInput
               label="Due Date"
               name="endDate"
-              value={formatDate(editRevenue.endDate)}
+              value={formatDate(editInvoice.endDate)}
               onChange={handleEditInputChange}
               disabled
               fullWidth
@@ -527,7 +527,7 @@ export default function revenueData() {
             <MDInput
               label="Apartment ID"
               name="apartmentId"
-              value={editRevenue.apartmentId}
+              value={editInvoice.apartmentId}
               disabled
               fullWidth
             />
@@ -544,10 +544,10 @@ export default function revenueData() {
       </Dialog>
       {/* Delete Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Revenue</DialogTitle>
+        <DialogTitle>Delete Invoice</DialogTitle>
         <DialogContent>
           <MDTypography>
-            Are you sure you want to delete the fee &quot;{selectedRevenue?.type}&quot;?
+            Are you sure you want to delete the fee &quot;{selectedInvoice?.type}&quot;?
           </MDTypography>
         </DialogContent>
         <DialogActions>
@@ -580,7 +580,7 @@ export default function revenueData() {
               <MDBox fullWidth label="Type">
                 <select
                   name="type"
-                  value={newRevenue.type}
+                  value={newInvoice.type}
                   onChange={handleInputChange}
                   style={{
                     height: "42px",
@@ -603,7 +603,7 @@ export default function revenueData() {
               <MDInput
                 label="Units used"
                 name="used"
-                value={newRevenue.used}
+                value={newInvoice.used}
                 onChange={handleInputChange}
                 fullWidth
               />
@@ -611,7 +611,7 @@ export default function revenueData() {
                 label="Due date"
                 name="endDate"
                 type="date"
-                value={newRevenue.endDate || new Date().toISOString().split("T")[0]}
+                value={newInvoice.endDate || new Date().toISOString().split("T")[0]}
                 onChange={handleInputChange}
                 inputProps={{
                   min: new Date().toISOString().split("T")[0],

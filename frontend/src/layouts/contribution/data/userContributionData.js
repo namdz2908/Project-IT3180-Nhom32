@@ -116,7 +116,7 @@ export default function userContributionData({ apartmentId }) {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`http://localhost:8080/revenue/delete?id=${selectedRevenue.id}`, {
+      await axios.delete(`http://localhost:8080/invoices/delete?id=${selectedRevenue.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Delete contribution successfully!");
@@ -165,7 +165,7 @@ export default function userContributionData({ apartmentId }) {
         apartmentId: apartmentId,
       };
       console.log("newconvertedRevenue:", converted);
-      await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
+      await axios.post("http://localhost:8080/invoices/create-with-qr", converted, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Create contribution successfully!");
@@ -201,7 +201,7 @@ export default function userContributionData({ apartmentId }) {
 
   const handleEditSubmit = async () => {
     try {
-      await axios.put(`http://localhost:8080/revenue/${editRevenue.id}`, editRevenue, {
+      await axios.put(`http://localhost:8080/invoices/${editRevenue.id}`, editRevenue, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       alert("Edit contribution successfully!");

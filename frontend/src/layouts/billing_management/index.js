@@ -30,11 +30,11 @@ import DataTable from "examples/Tables/DataTable";
 
 // Data
 import feeTableData from "layouts/billing_management/data/feeTableData";
-import revenueTableData from "layouts/billing_management/data/revenueTableData";
+import InvoiceTableData from "layouts/billing_management/data/invoiceTableData";
 
 function BillingTable() {
   const { columns, rows, searchUI } = feeTableData();
-  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = revenueTableData();
+  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = InvoiceTableData();
 
   return (
     <DashboardLayout>
@@ -120,10 +120,10 @@ function BillingTable() {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <Icon sx={{ mr: 1 }}>receipt_long</Icon>
-                    Revenue Table
+                    Invoice Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage all revenues
+                    Manage all Invoices
                   </MDTypography>
                 </MDBox>
               </MDBox>

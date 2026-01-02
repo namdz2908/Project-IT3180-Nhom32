@@ -10,12 +10,13 @@ public class ApartmentDTO {
     private Boolean isOccupied;
     private Integer occupants;
     private List<String> residentUsernames;
-    private List<Long> revenueIds;
+    private List<Long> invoiceIds;
 
-    public ApartmentDTO() {}
+    public ApartmentDTO() {
+    }
 
     public ApartmentDTO(String apartmentId, Integer floor, Float area, String owner, Boolean isOccupied,
-                        Integer occupants, List<String> residentUsernames, List<Long> revenueIds) {
+            Integer occupants, List<String> residentUsernames, List<Long> invoiceIds) {
         this.apartmentId = apartmentId;
         this.floor = floor;
         this.area = area;
@@ -23,7 +24,7 @@ public class ApartmentDTO {
         this.isOccupied = isOccupied;
         this.occupants = occupants;
         this.residentUsernames = residentUsernames;
-        this.revenueIds = revenueIds;
+        this.invoiceIds = invoiceIds;
     }
 
     // Getters and Setters
@@ -83,11 +84,11 @@ public class ApartmentDTO {
         this.residentUsernames = residentUsernames;
     }
 
-    public List<Long> getRevenueIds() {
-        return revenueIds;
+    public List<Long> getInvoiceIds() {
+        return invoiceIds;
     }
 
-    public void setRevenueIds(List<Long> revenueIds) {
-        this.revenueIds = revenueIds;
+    public void setInvoiceIds(List<Long> invoiceIds) {
+        this.invoiceIds = invoiceIds;
     }
 }

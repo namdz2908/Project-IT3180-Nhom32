@@ -5,7 +5,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, Box } from "@mui/material";
 import Bill from "layouts/billing/components/Paid";
-import { getRevenue, getFeeByType } from "../../api";
+import { getInvoice, getFeeByType } from "../../api";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import QRModal from "../QR/QRModal";
@@ -27,7 +27,7 @@ function PaidBills() {
     const fetchBills = async () => {
       setLoading(true);
       try {
-        const data = await getRevenue(userId);
+        const data = await getInvoice(userId);
         if (data) {
           setBills(data);
           console.log("setbill is : --------------", data);

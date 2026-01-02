@@ -26,7 +26,7 @@ import MDButton from "components/MDButton";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import React, { useState } from "react";
-import { createRevenue } from "../../api";
+import { createInvoice } from "../../api";
 // Images
 import masterCardLogo from "assets/images/logos/mastercard.png";
 import visaLogo from "assets/images/logos/visa.png";
@@ -34,7 +34,7 @@ import visaLogo from "assets/images/logos/visa.png";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
-function AddRevenue() {
+function AddInvoice() {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
   const feeRates = {
@@ -43,7 +43,7 @@ function AddRevenue() {
     service: 8000, // Fixed service fee
     donate: 0, // Donation
   };
-  const [newRevenue, setNewRevenue] = useState({
+  const [newInvoice, setNewInvoice] = useState({
     type: "",
     apartmentID: "",
     total: "",
@@ -54,7 +54,7 @@ function AddRevenue() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     // Update entered value
-    setNewRevenue((prevState) => {
+    setNewInvoice((prevState) => {
       const updatedState = { ...prevState, [name]: value };
       // If `fee` or `used` changes, recalculate `total`
       if (name === "fee" || name === "used") {
@@ -67,7 +67,7 @@ function AddRevenue() {
   const handleTypeChange = (event) => {
     const selectedType = event.target.value;
     const fee = feeRates[selectedType] || 0; // Fixed price by type
-    setNewRevenue((prevState) => ({
+    setNewInvoice((prevState) => ({
       ...prevState,
       type: selectedType,
       fee: feeRates[selectedType],
@@ -76,43 +76,43 @@ function AddRevenue() {
   };
   const handleUsedChange = (event) => {
     const used = Number(event.target.value) || 0;
-    setNewRevenue((prevState) => ({
+    setNewInvoice((prevState) => ({
       ...prevState,
       used,
       total: prevState.fee * used, // Automatically update total
     }));
   };
 
-  // Add revenue to the list (or send data)
-  const handleAddRevenue = async () => {
-    if (!newRevenue.type || !newRevenue.used) {
+  // Add Invoice to the list (or send data)
+  const handleAddInvoice = async () => {
+    if (!newInvoice.type || !newInvoice.used) {
       alert("Please select a fee type and enter the number of units used!");
       return;
     }
     const payload = {
-      type: newRevenue.type,
+      type: newInvoice.type,
       apartmentId: localStorage.getItem("apartmentId").toString(), // Get from localStorage
-      used: newRevenue.used,
-      total: newRevenue.used * newRevenue.fee, // Calculate total
+      used: newInvoice.used,
+      total: newInvoice.used * newInvoice.fee, // Calculate total
       status: "false",
     };
     try {
       console.log(payload);
-      const result = await createRevenue(payload);
+      const result = await createInvoice(payload);
       console.log("Fee added successfully:", result);
       alert("Fee has been added!");
       // Reset form after successful submission
-      setNewRevenue({ type: "", fee: "", used: "", total: "" });
+      setNewInvoice({ type: "", fee: "", used: "", total: "" });
     } catch (error) {
       console.error("Error adding fee:", error);
       alert("An error occurred while creating the fee. Please try again!");
     }
   };
   return (
-    <Card id="add-revenue">
+    <Card id="add-Invoice">
       <MDBox pt={2} px={2} display="flex" justifyContent="space-between" alignItems="center">
         <MDTypography variant="h6" fontWeight="medium"></MDTypography>
-        <MDButton variant="gradient" color="dark" onClick={handleAddRevenue}>
+        <MDButton variant="gradient" color="dark" onClick={handleAddInvoice}>
           <Icon sx={{ fontWeight: "bold" }}>add</Icon>
           &nbsp;Add Fee
         </MDButton>
@@ -126,7 +126,7 @@ function AddRevenue() {
               fullWidth
               name="type"
               label="Select fee type"
-              value={newRevenue.type}
+              value={newInvoice.type}
               onChange={handleTypeChange}
               SelectProps={{
                 native: true,
@@ -145,7 +145,7 @@ function AddRevenue() {
               fullWidth
               label={`Apartment ID: ${localStorage.getItem("apartmentId") || 3333}`}
               name="apartmentID"
-              value={newRevenue.apartmentID}
+              value={newInvoice.apartmentID}
               onChange={handleInputChange}
               variant="outlined"
               margin="normal"
@@ -158,7 +158,7 @@ function AddRevenue() {
               fullWidth
               label="Total Amount"
               name="total"
-              value={newRevenue.total}
+              value={newInvoice.total}
               onChange={handleInputChange}
               variant="outlined"
               margin="normal"
@@ -172,7 +172,7 @@ function AddRevenue() {
               fullWidth
               label="Price Per Unit"
               name="fee"
-              value={newRevenue.fee}
+              value={newInvoice.fee}
               onChange={handleInputChange}
               variant="outlined"
               margin="normal"
@@ -185,7 +185,7 @@ function AddRevenue() {
               fullWidth
               label="Number of Units Used"
               name="used"
-              value={newRevenue.used}
+              value={newInvoice.used}
               onChange={handleUsedChange}
               variant="outlined"
               margin="normal"
@@ -198,4 +198,4 @@ function AddRevenue() {
   );
 }
 
-export default AddRevenue;
+export default AddInvoice;

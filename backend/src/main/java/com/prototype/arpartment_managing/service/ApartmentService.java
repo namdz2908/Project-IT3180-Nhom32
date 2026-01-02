@@ -4,12 +4,12 @@ import com.prototype.arpartment_managing.dto.UserDTO;
 import com.prototype.arpartment_managing.exception.ApartmentNotFoundException;
 import com.prototype.arpartment_managing.exception.FeeNotFoundException;
 import com.prototype.arpartment_managing.model.Fee;
-import com.prototype.arpartment_managing.model.Revenue;
+import com.prototype.arpartment_managing.model.Invoice;
 import com.prototype.arpartment_managing.model.User;
 import com.prototype.arpartment_managing.model.Apartment;
 import com.prototype.arpartment_managing.repository.ApartmentRepository;
 import com.prototype.arpartment_managing.repository.FeeRepository;
-import com.prototype.arpartment_managing.repository.RevenueRepository;
+import com.prototype.arpartment_managing.repository.InvoiceRepository;
 import com.prototype.arpartment_managing.repository.UserRepository;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
@@ -36,7 +36,7 @@ public class ApartmentService {
     @Autowired
     private FeeRepository feeRepository;
     @Autowired
-    private RevenueRepository revenueRepository;
+    private InvoiceRepository invoiceRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -82,8 +82,8 @@ public class ApartmentService {
         }
         userRepository.saveAll(apartment.getResidents()); // Save changes to users
 
-        for (Revenue revenue : new ArrayList<>(apartment.getRevenues())) {
-            revenueRepository.delete(revenue);
+        for (Invoice invoice : new ArrayList<>(apartment.getInvoices())) {
+            invoiceRepository.delete(invoice);
         }
         apartmentRepository.delete(apartment);
     }
@@ -124,25 +124,25 @@ public class ApartmentService {
     // Calculates individual fees
     // .sum(); // Sums up all fees
     // }
-    public List<Revenue> findAllRevenueByApartmentId(String apartmentId) {
+    public List<Invoice> findAllInvoiceByApartmentId(String apartmentId) {
         Apartment apartment = apartmentRepository.findByApartmentId(apartmentId)
                 .orElseThrow(() -> new ApartmentNotFoundException(apartmentId));
-        return apartment.getRevenues();
+        return apartment.getInvoices();
     }
 
     public Double calculateTotalPayment(String apartmentId) {
-        List<Revenue> revenues = findAllRevenueByApartmentId(apartmentId);
-        if (revenues.isEmpty()) {
+        List<Invoice> invoices = findAllInvoiceByApartmentId(apartmentId);
+        if (invoices.isEmpty()) {
             return 0.0;
         }
 
-        // Update status for all revenues first
-        revenues.forEach(Revenue::updateStatus);
+        // Update status for all invoices first
+        invoices.forEach(Invoice::updateStatus);
 
-        // Sum up the total of all unpaid and overdue revenues
-        return revenues.stream()
-                .filter(revenue -> "Unpaid".equals(revenue.getStatus()) || "Overdue".equals(revenue.getStatus()))
-                .mapToDouble(Revenue::getTotal)
+        // Sum up the total of all unpaid and overdue invoices
+        return invoices.stream()
+                .filter(invoice -> "Unpaid".equals(invoice.getStatus()) || "Overdue".equals(invoice.getStatus()))
+                .mapToDouble(Invoice::getTotal)
                 .sum();
     }
 
@@ -236,74 +236,74 @@ public class ApartmentService {
                     tableCellFont);
             document.add(apartmentTable);
 
-            // Add revenue details section
-            Paragraph revenueInfo = new Paragraph("Revenue Details", sectionFont);
-            revenueInfo.setSpacingBefore(10);
-            revenueInfo.setSpacingAfter(10);
-            document.add(revenueInfo);
+            // Add invoice details section
+            Paragraph invoiceInfo = new Paragraph("Invoice Details", sectionFont);
+            invoiceInfo.setSpacingBefore(10);
+            invoiceInfo.setSpacingAfter(10);
+            document.add(invoiceInfo);
 
-            // Add revenue table with better formatting
-            PdfPTable revenueTable = new PdfPTable(5);
-            revenueTable.setWidthPercentage(100);
-            revenueTable.setSpacingBefore(10);
-            revenueTable.setSpacingAfter(10);
+            // Add invoice table with better formatting
+            PdfPTable invoiceTable = new PdfPTable(5);
+            invoiceTable.setWidthPercentage(100);
+            invoiceTable.setSpacingBefore(10);
+            invoiceTable.setSpacingAfter(10);
 
             // Set column widths
             float[] columnWidths = { 2f, 2f, 2f, 2f, 2f };
-            revenueTable.setWidths(columnWidths);
+            invoiceTable.setWidths(columnWidths);
 
             // Add table headers
-            addTableHeader(revenueTable, "Type", tableHeaderFont);
-            addTableHeader(revenueTable, "Usage", tableHeaderFont);
-            addTableHeader(revenueTable, "Unit", tableHeaderFont);
-            addTableHeader(revenueTable, "Unit Price", tableHeaderFont);
-            addTableHeader(revenueTable, "Total", tableHeaderFont);
+            addTableHeader(invoiceTable, "Type", tableHeaderFont);
+            addTableHeader(invoiceTable, "Usage", tableHeaderFont);
+            addTableHeader(invoiceTable, "Unit", tableHeaderFont);
+            addTableHeader(invoiceTable, "Unit Price", tableHeaderFont);
+            addTableHeader(invoiceTable, "Total", tableHeaderFont);
 
-            // Add revenue rows
-            List<Revenue> revenues = apartment.getRevenueWithStatusOrId(status, id);
-            if (revenues == null || revenues.isEmpty()) {
+            // Add invoice rows
+            List<Invoice> invoices = apartment.getInvoiceWithStatusOrId(status, id);
+            if (invoices == null || invoices.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error generating bill because revenues are empty in generateBill");
+                        .body("Error generating bill because invoices are empty in generateBill");
             }
             double totalAmount = 0.0;
-            for (Revenue revenue : revenues) {
-                Fee fee = feeRepository.findByType(revenue.getType())
-                        .orElseThrow(() -> new FeeNotFoundException("Fee not found for type: " + revenue.getType()));
+            for (Invoice invoice : invoices) {
+                Fee fee = feeRepository.findByType(invoice.getType())
+                        .orElseThrow(() -> new FeeNotFoundException("Fee not found for type: " + invoice.getType()));
 
-                double amount = revenue.getUsed() * fee.getPricePerUnit();
+                double amount = invoice.getUsed() * fee.getPricePerUnit();
                 totalAmount += amount;
 
-                // Get unit based on revenue type
-                String unit = getUnitForType(revenue.getType());
+                // Get unit based on invoice type
+                String unit = getUnitForType(invoice.getType());
 
                 // Create cells with center alignment
-                PdfPCell typeCell = new PdfPCell(new Phrase(revenue.getType(), tableCellFont));
+                PdfPCell typeCell = new PdfPCell(new Phrase(invoice.getType(), tableCellFont));
                 typeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 typeCell.setPadding(5);
-                revenueTable.addCell(typeCell);
+                invoiceTable.addCell(typeCell);
 
-                PdfPCell usageCell = new PdfPCell(new Phrase(String.format("%.2f", revenue.getUsed()), tableCellFont));
+                PdfPCell usageCell = new PdfPCell(new Phrase(String.format("%.2f", invoice.getUsed()), tableCellFont));
                 usageCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 usageCell.setPadding(5);
-                revenueTable.addCell(usageCell);
+                invoiceTable.addCell(usageCell);
 
                 PdfPCell unitCell = new PdfPCell(new Phrase(unit, tableCellFont));
                 unitCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 unitCell.setPadding(5);
-                revenueTable.addCell(unitCell);
+                invoiceTable.addCell(unitCell);
 
                 PdfPCell priceCell = new PdfPCell(
                         new Phrase(String.format("%.2f VND", fee.getPricePerUnit()), tableCellFont));
                 priceCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 priceCell.setPadding(5);
-                revenueTable.addCell(priceCell);
+                invoiceTable.addCell(priceCell);
 
                 PdfPCell totalCell = new PdfPCell(new Phrase(String.format("%.2f VND", amount), tableCellFont));
                 totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 totalCell.setPadding(5);
-                revenueTable.addCell(totalCell);
+                invoiceTable.addCell(totalCell);
             }
-            document.add(revenueTable);
+            document.add(invoiceTable);
 
             // Add total amount with right alignment
             Paragraph total = new Paragraph(String.format("Total Amount Due: %.2f VND", totalAmount), totalFont);
@@ -313,7 +313,7 @@ public class ApartmentService {
             // QR code
             if (id != null && Objects.equals(isQR, "True")) {
                 try {
-                    String qrBase64 = qrCodeService.generateQRCodeImage(apartment.getRevenueById(id).getPaymentToken());
+                    String qrBase64 = qrCodeService.generateQRCodeImage(apartment.getInvoiceById(id).getPaymentToken());
                     byte[] qrBytes = Base64.getDecoder().decode(qrBase64);
                     Image qrImage = Image.getInstance(qrBytes);
                     qrImage.scaleToFit(100, 100);

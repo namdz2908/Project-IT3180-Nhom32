@@ -3,8 +3,9 @@ package com.prototype.arpartment_managing.service;
 import com.prototype.arpartment_managing.exception.FeeInUseException;
 import com.prototype.arpartment_managing.exception.FeeNotFoundException;
 import com.prototype.arpartment_managing.model.Fee;
+import com.prototype.arpartment_managing.model.Invoice;
 import com.prototype.arpartment_managing.repository.FeeRepository;
-import com.prototype.arpartment_managing.repository.RevenueRepository;
+import com.prototype.arpartment_managing.repository.InvoiceRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +21,7 @@ public class FeeService {
     @Autowired
     private FeeRepository feeRepository;
     @Autowired
-    private RevenueRepository revenueRepository;
+    private InvoiceRepository invoiceRepository;
 
     @Transactional
     public Fee createFee(Fee fee) {
@@ -47,10 +48,10 @@ public class FeeService {
                 .orElseThrow(() -> new RuntimeException("Fee not found with type: " + type));
 
         // Check if there are any revenues using this fee type
-        long revenueCount = revenueRepository.countByType(type);
-        if (revenueCount > 0) {
+        long invoiceCount = invoiceRepository.countByType(type);
+        if (invoiceCount > 0) {
             // If there are revenues, check if any have status other than "Unpaid"
-            long nonUnpaidCount = revenueRepository.countByTypeAndStatusNotIn(type, List.of("Unpaid", "Overdue"));
+            long nonUnpaidCount = invoiceRepository.countByTypeAndStatusNotIn(type, List.of("Unpaid", "Overdue"));
             if (nonUnpaidCount > 0) {
                 throw new FeeInUseException("Cannot update fee type '" + type + "' as it is being used in paid revenues");
             }
@@ -59,11 +60,11 @@ public class FeeService {
         existingFee.setPricePerUnit(fee.getPricePerUnit());
         Fee savedFee = feeRepository.save(existingFee);
 
-        revenueRepository.findByTypeAndStatusIn(type, List.of("Unpaid", "Overdue"))
-                .forEach(revenue -> {
-                    double newTotal = revenue.getUsed() * savedFee.getPricePerUnit();
-                    revenue.setTotal(newTotal);
-                    revenueRepository.save(revenue);
+        invoiceRepository.findByTypeAndStatusIn(type, List.of("Unpaid", "Overdue"))
+                .forEach(invoice -> {
+                    double newTotal = invoice.getUsed() * savedFee.getPricePerUnit();
+                    invoice.setTotal(newTotal);
+                    invoiceRepository.save(invoice);
                 });
 
         return savedFee;
@@ -76,7 +77,7 @@ public class FeeService {
                 .orElseThrow(() -> new RuntimeException("Fee not found with type: " + type));
 
         // Check if fee is being used in any revenues
-        if (revenueRepository.existsByType(type)) {
+        if (invoiceRepository.existsByType(type)) {
             throw new FeeInUseException("Cannot delete fee type '" + type + "' as it is being used in existing revenues");
         }
 
@@ -90,7 +91,7 @@ public class FeeService {
      * @return true if the fee can be safely deleted, false otherwise
      */
     public boolean isFeeSafeToDelete(String type) {
-        return !revenueRepository.existsByType(type);
+        return !invoiceRepository.existsByType(type);
     }
 
     /**
@@ -99,7 +100,7 @@ public class FeeService {
      * @return The number of revenues using this fee type
      */
     public long getRevenueCountForFeeType(String type) {
-        return revenueRepository.countByType(type);
+        return invoiceRepository.countByType(type);
     }
 
     public Iterable<Fee> getAllFees() {
