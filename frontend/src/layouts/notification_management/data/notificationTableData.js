@@ -343,9 +343,9 @@ export default function data() {
               }}
             >
               <option value="title">Title</option>
-              <option value="content">Content</option>
+              {/* <option value="content">Content</option> */}
               <option value="type">Type</option>
-              <option value="createdAt">createdAt</option>
+              {/* <option value="createdAt">createdAt</option> */}
             </select>
           </MDBox>
           <MDInput
