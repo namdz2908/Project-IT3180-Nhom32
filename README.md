@@ -38,7 +38,7 @@ cd Project-IT3180-Nhom32
 ### Bước 2: Cấu hình database
 
 1. Mở công cụ quản trị MySQL (như MySQL Workbench hoặc phpMyAdmin).
-2. Kết nối tới Server Local (mặc định tại `localhost:3306`) và tạo một **Schema (Database)** mới với tên tùy chọn (Ví dụ: `bluemoon`).
+2. Kết nối tới Server Local (mặc định tại `localhost:3306`, thường có username là root) và tạo một **Schema (Database)** mới với tên tùy chọn (Ví dụ: `bluemoon`).
 3. **Nạp dữ liệu mẫu để test:**
    * Trong MySQL Workbench, vào mục **File** -> **Open SQL Script**.
    * Chọn file `database/init_test_data.sql` nằm trong thư mục gốc của dự án.
@@ -47,8 +47,8 @@ cd Project-IT3180-Nhom32
 4. Cấu hình thông tin kết nối trong file `backend/src/main/resources/application.properties` để khớp với máy của bạn:
    ```properties
    # Đảm bảo URL trỏ đúng về localhost:3306 và tên Schema bạn đã tạo
-   spring.datasource.url=jdbc:mysql://localhost:3306/<Your_Schema_Name>
-   spring.datasource.username=root
+   spring.datasource.url=jdbc:mysql://localhost:3306/<Your_Schema_Name>?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+   spring.datasource.username=<Your_Database_Name>
    spring.datasource.password=<Your_Database_Password>
    ```
 
@@ -85,6 +85,16 @@ cd Project-IT3180-Nhom32
 Khi bạn đã chạy thành công cả backend và frontend, bạn có thể truy cập `http://localhost:5000`. Hệ thống sẽ tự động kết nối với API tại cổng `8080`.
 
 ## Đăng nhập vào ứng dụng
+
+Đảm bảo trong database của bạn đã insert bản ghi : 
+```sql
+INSERT INTO users
+(full_name, username, email, password, phone_number, role, citizen_identification, apartment_id, is_active)
+VALUES
+('Administrator', 'admin', 'admin@example.com',
+ '$2a$10$C2XiRKemh1p/8fypHnlM3u0rk5MStCFCPr8FRk6c.4CQr8gIAvnk2',
+ '0900000000', 'ADMIN', '123456789012', 'A101', 1);
+ ```
 
 Sử dụng tài khoản mặc định sau để trải nghiệm đầy đủ tính năng:
 
