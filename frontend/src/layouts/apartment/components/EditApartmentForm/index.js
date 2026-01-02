@@ -16,7 +16,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-function EditApartmentForm({ onCancel, onSave }) {
+function EditApartmentForm({ onCancel, onSave, userRole }) {
   const navigate = useNavigate();
   const { apartmentId: urlApartmentId } = useParams();
 
@@ -72,24 +72,22 @@ function EditApartmentForm({ onCancel, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (userRole !== "ADMIN") return;
+
     try {
-      console.log("Updating apartment with data:", formData);
       const response = await axios.put(
         `http://localhost:8080/apartment/${formData.apartmentId}`,
         formData,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      console.log("Update response:", response);
       alert("Apartment updated successfully!");
-      if (onSave) {
-        onSave();
-      }
+      onSave();
     } catch (error) {
       console.error(
         "Error updating apartment:",
         error.response ? error.response.data : error.message
       );
-      alert("Failed to update apartment: The number of residents does not match.");
+      alert("Failed to update apartment.");
     }
   };
 
@@ -97,9 +95,10 @@ function EditApartmentForm({ onCancel, onSave }) {
     <Card sx={{ height: "100%", boxShadow: "none" }}>
       <MDBox p={2}>
         <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
-          Edit Apartment Information
+          {userRole === "ADMIN" ? "Edit Apartment Information" : "View Apartment Information"}
         </MDTypography>
       </MDBox>
+
       <MDBox component="form" p={2} onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
@@ -107,11 +106,11 @@ function EditApartmentForm({ onCancel, onSave }) {
               label="Apartment ID"
               name="apartmentId"
               value={formData.apartmentId}
-              onChange={handleInputChange}
               fullWidth
               inputProps={{ readOnly: true }}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <MDInput
               label="Floor"
@@ -120,9 +119,10 @@ function EditApartmentForm({ onCancel, onSave }) {
               value={formData.floor}
               onChange={handleInputChange}
               fullWidth
-              inputProps={{ min: 1 }}
+              disabled={userRole !== "ADMIN"}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <MDInput
               label="Area (m²)"
@@ -131,9 +131,10 @@ function EditApartmentForm({ onCancel, onSave }) {
               value={formData.area}
               onChange={handleInputChange}
               fullWidth
-              inputProps={{ min: 1 }}
+              disabled={userRole !== "ADMIN"}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <MDInput
               label="Apartment Type"
@@ -141,8 +142,10 @@ function EditApartmentForm({ onCancel, onSave }) {
               value={formData.apartmentType}
               onChange={handleInputChange}
               fullWidth
+              disabled={userRole !== "ADMIN"}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <MDInput
               label="Owner"
@@ -150,8 +153,10 @@ function EditApartmentForm({ onCancel, onSave }) {
               value={formData.owner}
               onChange={handleInputChange}
               fullWidth
+              disabled={userRole !== "ADMIN"}
             />
           </Grid>
+
           <Grid item xs={12} md={6}>
             <MDInput
               label="Occupant Capacity"
@@ -159,41 +164,32 @@ function EditApartmentForm({ onCancel, onSave }) {
               type="number"
               value={formData.occupants}
               onChange={handleInputChange}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                  e.preventDefault();
-                }
-              }}
               fullWidth
-              sx={{
-                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
-                  margin: 0,
-                  WebkitAppearance: "none",
-                },
-                "& input[type=number]": {
-                  MozAppearance: "textfield",
-                },
-              }}
+              disabled={userRole !== "ADMIN"}
             />
           </Grid>
         </Grid>
-        <MDBox mt={3} mb={1} display="flex" justifyContent="space-between">
+
+        <MDBox mt={3} display="flex" justifyContent="space-between">
           <MDButton variant="gradient" color="light" onClick={onCancel}>
             Cancel
           </MDButton>
-          <MDButton variant="gradient" color="info" type="submit">
-            Save Changes
-          </MDButton>
+
+          {userRole === "ADMIN" && (
+            <MDButton variant="gradient" color="info" type="submit">
+              Save Changes
+            </MDButton>
+          )}
         </MDBox>
       </MDBox>
     </Card>
   );
 }
 
-// PropTypes validation
 EditApartmentForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  userRole: PropTypes.string.isRequired,
 };
 
 export default EditApartmentForm;
