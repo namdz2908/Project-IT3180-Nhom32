@@ -61,10 +61,10 @@ function ApartmentManagement() {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <Icon sx={{ mr: 1 }}>people</Icon>
-                    Residents Table
+                    Apartment Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage all residents in the building
+                    Manage all apartments in the building
                   </MDTypography>
                 </MDBox>
               </MDBox>
