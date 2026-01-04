@@ -5,6 +5,7 @@ import com.prototype.arpartment_managing.exception.*;
 import com.prototype.arpartment_managing.model.Apartment;
 import com.prototype.arpartment_managing.model.Fee;
 import com.prototype.arpartment_managing.model.Revenue;
+import com.prototype.arpartment_managing.model.User;
 import com.prototype.arpartment_managing.repository.ApartmentRepository;
 import com.prototype.arpartment_managing.repository.FeeRepository;
 import com.prototype.arpartment_managing.repository.RevenueRepository;
@@ -17,12 +18,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.UUID;
-import java.util.HashMap;
 
 @Primary
 @Service
@@ -75,46 +72,90 @@ public class RevenueService {
     }
 
     @Transactional
-    // Create Revenue
+    // Create Revenue with comprehensive validation
     public Revenue createRevenue(RevenueDTO revenueDTO) {
-        // Validate Apartment ID
-        if (revenueDTO.getApartmentId() == null) {
-            throw new IllegalArgumentException("Apartment ID must not be null");
+        // 1. Validate Apartment ID
+        if (revenueDTO.getApartmentId() == null || revenueDTO.getApartmentId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Apartment ID must not be null or empty");
         }
 
-        // Get the apartment first to access its properties
+        // 2. Get and validate apartment
         Apartment apartment = apartmentRepository.findByApartmentId(revenueDTO.getApartmentId())
                 .orElseThrow(() -> new ApartmentNotFoundException(revenueDTO.getApartmentId()));
 
+        // 3. Validate apartment has residents
+        if (apartment.getResidents() == null || apartment.getResidents().isEmpty()) {
+            throw new IllegalArgumentException("Cannot create revenue for apartment " + 
+                    revenueDTO.getApartmentId() + ": No residents found in this apartment");
+        }
+
+        // 4. Validate apartment has active residents
+        long activeResidentCount = apartment.getResidents().stream()
+                .filter(User::isActive)
+                .count();
+        
+        if (activeResidentCount == 0) {
+            throw new IllegalArgumentException("Cannot create revenue for apartment " + 
+                    revenueDTO.getApartmentId() + ": No active residents in this apartment");
+        }
+
+        // 5. Validate revenue type
+        if (revenueDTO.getType() == null || revenueDTO.getType().trim().isEmpty()) {
+            throw new IllegalArgumentException("Revenue type must not be null or empty");
+        }
+
+        // 6. Validate that fee exists for this type
+        Fee fee = feeRepository.findByType(revenueDTO.getType())
+                .orElseThrow(() -> new FeeNotFoundException("Fee not found for type: " + revenueDTO.getType()));
+
+        // 7. Validate used value
+        if (revenueDTO.getUsed() < 0) {
+            throw new IllegalArgumentException("Used value cannot be negative");
+        }
+
+        // 8. Create revenue object
         Revenue revenue = new Revenue();
 
-        // For Service type, automatically use the apartment area as the used value
+        // 9. Set used value (Service type uses apartment area)
         if ("Service".equals(revenueDTO.getType()) && apartment.getArea() != null) {
-            revenue.setUsed(apartment.getArea());
+            revenue.setUsed(apartment.getArea().doubleValue());
         } else {
             revenue.setUsed(revenueDTO.getUsed());
         }
 
-        revenue.setStatus(revenueDTO.getStatus());
+        // 10. Set status (default to "Unpaid" if not provided)
+        revenue.setStatus(revenueDTO.getStatus() != null ? revenueDTO.getStatus() : "Unpaid");
+        
+        // 11. Set type
         revenue.setType(revenueDTO.getType());
 
-        // Set end date if provided
+        // 12. Set end date (default to last day of next month if not provided)
         if (revenueDTO.getEndDate() != null) {
             revenue.setEndDate(revenueDTO.getEndDate());
+        } else {
+            revenue.setEndDate(LocalDate.now()
+                    .plusMonths(1)
+                    .with(TemporalAdjusters.lastDayOfMonth())
+                    .atStartOfDay());
         }
-        // else{
-        // revenue.setEndDate(LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay());
-        // } // Set apartment (already retrieved above)
+
+        // 13. Set apartment relationship
         revenue.setApartment(apartment);
 
-        Optional<Fee> feeOpt = feeRepository.findByType(revenueDTO.getType());
-        double calculatedTotal = feeOpt.map(fee -> revenueDTO.getUsed() * fee.getPricePerUnit()).orElse(0.0);
+        // 14. Calculate total
+        double calculatedTotal = revenue.getUsed() * fee.getPricePerUnit();
         revenue.setTotal(calculatedTotal);
 
+        // 15. Save revenue
         revenue = revenueRepository.save(revenue);
 
-        // Update apartment
+        // 16. Update apartment revenues list
+        if (apartment.getRevenues() == null) {
+            apartment.setRevenues(new ArrayList<>());
+        }
         apartment.getRevenues().add(revenue);
+        
+        // 17. Update apartment total
         apartment.setTotal(calculateTotalPayment(apartment.getApartmentId()));
         apartmentRepository.save(apartment);
 
