@@ -58,6 +58,9 @@ public class ApartmentService {
     }
 
     public Apartment createApartment(Apartment apartment) {
+        if (apartment.getApartmentId() == null || apartment.getApartmentId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Apartment ID must not be null or empty");
+        }
         if (apartment.getArea() <= 0) {
             throw new IllegalArgumentException("Area must be greater than 0");
         }
