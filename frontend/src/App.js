@@ -62,6 +62,9 @@ import PaymentComplete from "layouts/payment";
 // Public Route
 import PublicRoute from "components/PublicRoute";
 
+// Protected Route
+import ProtectedRoute from "components/ProtectedRoute";
+
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
   const {
@@ -74,6 +77,7 @@ export default function App() {
     whiteSidenav,
     darkMode,
   } = controller;
+
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
@@ -123,9 +127,12 @@ export default function App() {
       if (route.collapse) {
         return getRoutes(route.collapse);
       }
+
       if (route.route) {
-        // Protect Sign In route with PublicRoute
-        if (route.route === "/authentication/sign-in") {
+        if (
+          route.route === "/authentication/sign-in" ||
+          route.route === "/authentication/forget-password"
+        ) {
           return (
             <Route
               exact
@@ -135,8 +142,21 @@ export default function App() {
             />
           );
         }
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+
+        if (route.route.startsWith("/payment/complete")) {
+          return <Route exact path={route.route} element={route.component} key={route.key} />;
+        }
+
+        return (
+          <Route
+            exact
+            path={route.route}
+            element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+            key={route.key}
+          />
+        );
       }
+
       return null;
     });
 
@@ -188,7 +208,14 @@ export default function App() {
         <Routes>
           <Route path="/payment/complete/:paymentToken" element={<PaymentComplete />} />
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to={localStorage.getItem("token") ? "/dashboard" : "/authentication/sign-in"}
+              />
+            }
+          />
         </Routes>
       </ThemeProvider>
     </CacheProvider>
@@ -215,7 +242,14 @@ export default function App() {
       <Routes>
         {getRoutes(routes)}
         <Route path="/authentication/forget-password" element={<ForgetPassword />} />
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to={localStorage.getItem("token") ? "/dashboard" : "/authentication/sign-in"}
+            />
+          }
+        />
       </Routes>
     </ThemeProvider>
   );
