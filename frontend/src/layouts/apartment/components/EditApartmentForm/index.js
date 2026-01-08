@@ -28,6 +28,7 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
     apartmentType: "",
     owner: "",
     occupants: 0,
+    vehicleCount: 0,
   });
 
   useEffect(() => {
@@ -53,6 +54,7 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
         apartmentType: result.data.apartmentType || "",
         owner: result.data.owner || "",
         occupants: result.data.occupants || 0,
+        vehicleCount: result.data.vehicleCount || 0,
       });
     } catch (error) {
       console.error("Error loading apartment information:", error);
@@ -64,7 +66,8 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
     setFormData({
       ...formData,
       [name]:
-        (name === "floor" || name === "area" || name === "occupants") && value !== ""
+        (name === "floor" || name === "area" || name === "occupants" || name === "vehicleCount") &&
+        value !== ""
           ? Number(value)
           : value,
     });
@@ -163,6 +166,18 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
               name="occupants"
               type="number"
               value={formData.occupants}
+              onChange={handleInputChange}
+              fullWidth
+              disabled={userRole !== "ADMIN"}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <MDInput
+              label="Vehicle Count"
+              name="vehicleCount"
+              type="number"
+              value={formData.vehicleCount}
               onChange={handleInputChange}
               fullWidth
               disabled={userRole !== "ADMIN"}

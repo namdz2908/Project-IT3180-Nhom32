@@ -153,6 +153,24 @@ export default function useProjectsTableData() {
     </MDBox>
   );
 
+  const Vehicles = ({ count }) => (
+    <MDBox lineHeight={1} textAlign="left">
+      <MDTypography
+        variant="caption"
+        fontWeight="medium"
+        sx={{
+          backgroundColor: ({ palette: { info } }) => `${info.main}15`,
+          color: ({ palette: { info } }) => info.main,
+          padding: "5px 10px",
+          borderRadius: "4px",
+          display: "inline-block",
+        }}
+      >
+        {count} vehicles
+      </MDTypography>
+    </MDBox>
+  );
+
   const ApartmentType = ({ type }) => (
     <MDBox lineHeight={1} textAlign="left">
       <MDTypography
@@ -188,6 +206,7 @@ export default function useProjectsTableData() {
     owner: "",
     apartmentType: "",
     occupants: 0,
+    vehicleCount: 0,
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingApartment, setEditingApartment] = useState({
@@ -197,6 +216,7 @@ export default function useProjectsTableData() {
     owner: "",
     apartmentType: "",
     occupants: 0,
+    vehicleCount: 0,
   });
 
   useEffect(() => {
@@ -259,6 +279,7 @@ export default function useProjectsTableData() {
       owner: "",
       apartmentType: "",
       occupants: 0,
+      vehicleCount: 0,
     });
   };
 
@@ -266,7 +287,10 @@ export default function useProjectsTableData() {
     const { name, value } = e.target;
     setNewApartment((prev) => ({
       ...prev,
-      [name]: (name === "floor" || name === "area") && value !== "" ? Number(value) : value,
+      [name]:
+        (name === "floor" || name === "area" || name === "vehicleCount") && value !== ""
+          ? Number(value)
+          : value,
     }));
   };
 
@@ -299,7 +323,8 @@ export default function useProjectsTableData() {
     setEditingApartment((prev) => ({
       ...prev,
       [name]:
-        (name === "floor" || name === "area" || name === "occupants") && value !== ""
+        (name === "floor" || name === "area" || name === "occupants" || name === "vehicleCount") &&
+        value !== ""
           ? Number(value)
           : value,
     }));
@@ -333,6 +358,7 @@ export default function useProjectsTableData() {
           floor: <Floor number="1" />,
           occupants: <Occupants count={1} capacity={2} />,
           area: <Area size={45} />,
+          vehicles: <Vehicles count={1} />,
           type: <ApartmentType type="Studio" />,
           action: (
             <MDButton variant="text" color="info">
@@ -345,6 +371,7 @@ export default function useProjectsTableData() {
           floor: <Floor number="2" />,
           occupants: <Occupants count={3} capacity={4} />,
           area: <Area size={75} />,
+          vehicles: <Vehicles count={2} />,
           type: <ApartmentType type="2BR" />,
           action: (
             <MDButton variant="text" color="info">
@@ -366,6 +393,7 @@ export default function useProjectsTableData() {
       // ),
       occupants: <Occupants number={apartment.occupants || 0} />,
       area: <Area size={apartment.area || 0} />,
+      vehicles: <Vehicles count={apartment.vehicleCount || 0} />,
       type: <ApartmentType type={apartment.apartmentType || "N/A"} />,
       action: (
         <MDBox display="flex" gap={1}>
@@ -389,9 +417,10 @@ export default function useProjectsTableData() {
     columns: [
       { Header: "Apartment ID", accessor: "apartmentId", width: "25%", align: "left" },
       { Header: "Floor", accessor: "floor", width: "15%", align: "center" },
-      { Header: "Occupants", accessor: "occupants", width: "20%", align: "center" },
+      { Header: "Occupants", accessor: "occupants", width: "15%", align: "center" },
       { Header: "Area", accessor: "area", width: "15%", align: "center" },
-      { Header: "Type", accessor: "type", width: "15%", align: "center" },
+      { Header: "Vehicles", accessor: "vehicles", width: "13%", align: "center" },
+      { Header: "Type", accessor: "type", width: "12%", align: "center" },
       { Header: "Action", accessor: "action", width: "10%", align: "center" },
     ],
 
@@ -445,6 +474,15 @@ export default function useProjectsTableData() {
                 value={newApartment.owner}
                 onChange={handleInputChange}
                 fullWidth
+              />
+              <MDInput
+                label="Vehicle Count"
+                name="vehicleCount"
+                type="number"
+                value={newApartment.vehicleCount}
+                onChange={handleInputChange}
+                fullWidth
+                inputProps={{ min: 0 }}
               />
             </MDBox>
           </DialogContent>
@@ -502,6 +540,15 @@ export default function useProjectsTableData() {
                 name="occupants"
                 type="number"
                 value={editingApartment?.occupants || 0}
+                onChange={handleEditInputChange}
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+              <MDInput
+                label="Vehicle Count"
+                name="vehicleCount"
+                type="number"
+                value={editingApartment?.vehicleCount || 0}
                 onChange={handleEditInputChange}
                 fullWidth
                 inputProps={{ min: 0 }}

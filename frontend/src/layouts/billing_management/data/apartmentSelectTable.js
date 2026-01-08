@@ -30,7 +30,7 @@ import DataTable from "examples/Tables/DataTable";
 import PropTypes from "prop-types";
 
 // Data
-import apartmentSelectData from "layouts/billing_management/data/apartmentSelectData";
+import apartmentSelectData from "./apartmentSelectData";
 
 ApartmentSelectTable.propTypes = {
   selectedApartments: PropTypes.instanceOf(Set).isRequired,

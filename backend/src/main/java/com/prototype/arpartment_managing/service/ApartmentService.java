@@ -107,6 +107,7 @@ public class ApartmentService {
                     apartment.setOwner(newApartment.getOwner());
                     apartment.setArea(newApartment.getArea());
                     apartment.setApartmentType(newApartment.getApartmentType());
+                    apartment.setVehicleCount(newApartment.getVehicleCount());
                     apartment.setTotal(newApartment.getTotal());
                     return apartmentRepository.save(apartment);
                 }).orElseThrow(() -> new ApartmentNotFoundException(apartmentId));

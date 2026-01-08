@@ -24,6 +24,7 @@ function StatisticsTables() {
     movedOutResidents: 0,
     totalApartments: 0,
     apartmentTypes: {},
+    totalVehicles: 0,
   });
 
   const [financialStats, setFinancialStats] = useState({
@@ -77,6 +78,11 @@ function StatisticsTables() {
       details: Object.entries(residentStats.apartmentTypes)
         .map(([key, value]) => `${key}: ${value}`)
         .join(", "),
+    },
+    {
+      metric: "Total Vehicles",
+      count: residentStats.totalVehicles || 0,
+      details: "In all apartments",
     },
   ];
 

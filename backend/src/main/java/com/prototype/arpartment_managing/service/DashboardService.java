@@ -18,80 +18,88 @@ import java.util.stream.Collectors;
 @Service
 public class DashboardService {
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private ApartmentRepository apartmentRepository;
+        @Autowired
+        private ApartmentRepository apartmentRepository;
 
-    @Autowired
-    private RevenueRepository revenueRepository;
+        @Autowired
+        private RevenueRepository revenueRepository;
 
-    public Map<String, Object> getDashboardStatistics() {
-        Map<String, Object> stats = new HashMap<>();
+        public Map<String, Object> getDashboardStatistics() {
+                Map<String, Object> stats = new HashMap<>();
 
-        // 1. Resident Statistics
-        List<User> allUsers = userRepository.findAll();
-        long activeResidents = allUsers.stream().filter(User::isActive).count();
-        // Inactive residents: those who have moved out (movedOutAt != null) or
-        // explicitly marked inactive
-        long movedOutResidents = allUsers.stream()
-                .filter(u -> !u.isActive() || u.getMovedOutAt() != null)
-                .count();
+                // 1. Resident Statistics
+                List<User> allUsers = userRepository.findAll();
+                long activeResidents = allUsers.stream().filter(User::isActive).count();
+                // Inactive residents: those who have moved out (movedOutAt != null) or
+                // explicitly marked inactive
+                long movedOutResidents = allUsers.stream()
+                                .filter(u -> !u.isActive() || u.getMovedOutAt() != null)
+                                .count();
 
-        Map<String, Object> residentsStats = new HashMap<>();
-        residentsStats.put("activeResidents", activeResidents);
-        residentsStats.put("movedOutResidents", movedOutResidents);
+                Map<String, Object> residentsStats = new HashMap<>();
+                residentsStats.put("activeResidents", activeResidents);
+                residentsStats.put("movedOutResidents", movedOutResidents);
 
-        // 2. Apartment Statistics
-        List<Apartment> allApartments = apartmentRepository.findAll();
-        long totalApartments = allApartments.size();
+                // 2. Apartment Statistics
+                List<Apartment> allApartments = apartmentRepository.findAll();
+                long totalApartments = allApartments.size();
 
-        // Group by type
-        Map<String, Long> apartmentTypes = allApartments.stream()
-                .collect(Collectors.groupingBy(Apartment::getApartmentType, Collectors.counting()));
+                // Group by type
+                Map<String, Long> apartmentTypes = allApartments.stream()
+                                .collect(Collectors.groupingBy(Apartment::getApartmentType, Collectors.counting()));
 
-        residentsStats.put("totalApartments", totalApartments);
-        residentsStats.put("apartmentTypes", apartmentTypes);
+                long totalVehicles = allApartments.stream()
+                                .mapToLong(a -> a.getVehicleCount() != null ? a.getVehicleCount() : 0)
+                                .sum();
 
-        stats.put("residents", residentsStats);
+                residentsStats.put("totalApartments", totalApartments);
+                residentsStats.put("apartmentTypes", apartmentTypes);
+                residentsStats.put("totalVehicles", totalVehicles);
 
-        // 3. Financial Statistics
-        List<Revenue> allRevenues = revenueRepository.findAll();
+                stats.put("residents", residentsStats);
 
-        // Using helper class/map to store count and amount
-        Map<String, Object> financialStats = new HashMap<>();
+                // 3. Financial Statistics
+                List<Revenue> allRevenues = revenueRepository.findAll();
 
-        // Total Invoices
-        double totalAmount = allRevenues.stream()
-                .mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)
-                .sum();
-        financialStats.put("totalInvoices", Map.of("count", allRevenues.size(), "amount", totalAmount));
+                // Using helper class/map to store count and amount
+                Map<String, Object> financialStats = new HashMap<>();
 
-        // Paid
-        List<Revenue> paidRevenues = allRevenues.stream()
-                .filter(r -> "Paid".equalsIgnoreCase(r.getStatus()))
-                .collect(Collectors.toList());
-        double paidAmount = paidRevenues.stream().mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0).sum();
-        financialStats.put("paid", Map.of("count", paidRevenues.size(), "amount", paidAmount));
+                // Total Invoices
+                double totalAmount = allRevenues.stream()
+                                .mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)
+                                .sum();
+                financialStats.put("totalInvoices", Map.of("count", allRevenues.size(), "amount", totalAmount));
 
-        // Unpaid
-        List<Revenue> unpaidRevenues = allRevenues.stream()
-                .filter(r -> "Unpaid".equalsIgnoreCase(r.getStatus()))
-                .collect(Collectors.toList());
-        double unpaidAmount = unpaidRevenues.stream().mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0).sum();
-        financialStats.put("unpaid", Map.of("count", unpaidRevenues.size(), "amount", unpaidAmount));
+                // Paid
+                List<Revenue> paidRevenues = allRevenues.stream()
+                                .filter(r -> "Paid".equalsIgnoreCase(r.getStatus()))
+                                .collect(Collectors.toList());
+                double paidAmount = paidRevenues.stream().mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)
+                                .sum();
+                financialStats.put("paid", Map.of("count", paidRevenues.size(), "amount", paidAmount));
 
-        // Overdue
-        List<Revenue> overdueRevenues = allRevenues.stream()
-                .filter(r -> "Overdue".equalsIgnoreCase(r.getStatus()))
-                .collect(Collectors.toList());
-        double overdueAmount = overdueRevenues.stream().mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)
-                .sum();
-        financialStats.put("overdue", Map.of("count", overdueRevenues.size(), "amount", overdueAmount));
+                // Unpaid
+                List<Revenue> unpaidRevenues = allRevenues.stream()
+                                .filter(r -> "Unpaid".equalsIgnoreCase(r.getStatus()))
+                                .collect(Collectors.toList());
+                double unpaidAmount = unpaidRevenues.stream()
+                                .mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0).sum();
+                financialStats.put("unpaid", Map.of("count", unpaidRevenues.size(), "amount", unpaidAmount));
 
-        stats.put("financials", financialStats);
+                // Overdue
+                List<Revenue> overdueRevenues = allRevenues.stream()
+                                .filter(r -> "Overdue".equalsIgnoreCase(r.getStatus()))
+                                .collect(Collectors.toList());
+                double overdueAmount = overdueRevenues.stream()
+                                .mapToDouble(r -> r.getTotal() != null ? r.getTotal() : 0.0)
+                                .sum();
+                financialStats.put("overdue", Map.of("count", overdueRevenues.size(), "amount", overdueAmount));
 
-        return stats;
-    }
+                stats.put("financials", financialStats);
+
+                return stats;
+        }
 }

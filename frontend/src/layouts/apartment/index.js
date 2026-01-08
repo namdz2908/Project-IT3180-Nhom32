@@ -36,6 +36,7 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import SquareFootIcon from "@mui/icons-material/SquareFoot";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -71,6 +72,7 @@ function Apartment() {
     owner: "",
     occupants: 0,
     isOccupied: false,
+    vehicleCount: 0,
     residents: [],
     revenues: [],
     total: 0,
@@ -328,6 +330,17 @@ function Apartment() {
                           Capacity
                         </MDTypography>
                         <MDTypography variant="h6">{apartment.occupants} people</MDTypography>
+                      </MDBox>
+                    </MDBox>
+                    <MDBox display="flex" alignItems="center">
+                      <MDBox mr={1} color="text">
+                        <DirectionsCarIcon />
+                      </MDBox>
+                      <MDBox>
+                        <MDTypography variant="button" color="text" fontWeight="light">
+                          Vehicles
+                        </MDTypography>
+                        <MDTypography variant="h6">{apartment.vehicleCount} vehicles</MDTypography>
                       </MDBox>
                     </MDBox>
                   </MDBox>

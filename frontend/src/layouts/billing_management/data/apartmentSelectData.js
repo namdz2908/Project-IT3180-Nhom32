@@ -171,6 +171,24 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
     </MDBox>
   );
 
+  const Vehicles = ({ count }) => (
+    <MDBox lineHeight={1} textAlign="left">
+      <MDTypography
+        variant="caption"
+        fontWeight="medium"
+        sx={{
+          backgroundColor: ({ palette: { info } }) => `${info.main}15`,
+          color: ({ palette: { info } }) => info.main,
+          padding: "5px 10px",
+          borderRadius: "4px",
+          display: "inline-block",
+        }}
+      >
+        {count} vehicles
+      </MDTypography>
+    </MDBox>
+  );
+
   const ApartmentType = ({ type }) => (
     <MDBox lineHeight={1} textAlign="left">
       <MDTypography
@@ -280,6 +298,7 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
       return [
         {
           apartmentId: <Apartment id="A101" type="Studio" />,
+          vehicles: <Vehicles count={1} />,
           floor: <Floor number="1" />,
           occupants: <Occupants count={1} capacity={2} />,
           area: <Area size={45} />,
@@ -296,6 +315,7 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
         },
         {
           apartmentId: <Apartment id="B205" type="2BR" />,
+          vehicles: <Vehicles count={2} />,
           floor: <Floor number="2" />,
           occupants: <Occupants count={3} capacity={4} />,
           area: <Area size={75} />,
@@ -315,6 +335,7 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
     console.log(apartments);
     return apartments.map((apartment) => ({
       apartmentId: <Apartment id={apartment.apartmentId} type={apartment.apartmentType || "N/A"} />,
+      vehicles: <Vehicles count={apartment.vehicleCount || 0} />,
       floor: <Floor number={apartment.floor || "N/A"} />,
       occupants: <Occupants number={apartment.occupants || 0} />,
       area: <Area size={apartment.area || 0} />,
@@ -334,11 +355,12 @@ export default function ApartmentSelectData({ selectedApartments, setSelectedApa
 
   return {
     columns: [
-      { Header: "Apartment ID", accessor: "apartmentId", width: "25%", align: "left" },
-      { Header: "Floor", accessor: "floor", width: "15%", align: "center" },
-      { Header: "Occupants", accessor: "occupants", width: "20%", align: "center" },
-      { Header: "Area", accessor: "area", width: "15%", align: "center" },
-      { Header: "Type", accessor: "type", width: "15%", align: "center" },
+      { Header: "Mã Căn Hộ", accessor: "apartmentId", width: "15%", align: "left" },
+      { Header: "Số Lượng Xe", accessor: "vehicles", width: "15%", align: "center" },
+      { Header: "Floor", accessor: "floor", width: "12%", align: "center" },
+      { Header: "Occupants", accessor: "occupants", width: "15%", align: "center" },
+      { Header: "Area", accessor: "area", width: "13%", align: "center" },
+      { Header: "Type", accessor: "type", width: "12%", align: "center" },
       { Header: "Action", accessor: "action", width: "10%", align: "center" },
     ],
 
