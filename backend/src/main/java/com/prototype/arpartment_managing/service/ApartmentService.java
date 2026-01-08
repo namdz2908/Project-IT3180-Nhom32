@@ -107,6 +107,8 @@ public class ApartmentService {
                     apartment.setOwner(newApartment.getOwner());
                     apartment.setArea(newApartment.getArea());
                     apartment.setApartmentType(newApartment.getApartmentType());
+                    apartment.setWaterUsage(newApartment.getWaterUsage());
+                    apartment.setElectricityUsage(newApartment.getElectricityUsage());
                     apartment.setVehicleCount(newApartment.getVehicleCount());
                     apartment.setTotal(newApartment.getTotal());
                     return apartmentRepository.save(apartment);
