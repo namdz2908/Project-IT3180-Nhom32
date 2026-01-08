@@ -15,6 +15,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
+import Divider from "@mui/material/Divider";
 
 function EditApartmentForm({ onCancel, onSave, userRole }) {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
     owner: "",
     occupants: 0,
     vehicleCount: 0,
+    waterUsage: 0,
+    electricityUsage: 0,
   });
 
   useEffect(() => {
@@ -55,6 +58,8 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
         owner: result.data.owner || "",
         occupants: result.data.occupants || 0,
         vehicleCount: result.data.vehicleCount || 0,
+        waterUsage: result.data.waterUsage || 0,
+        electricityUsage: result.data.electricityUsage || 0,
       });
     } catch (error) {
       console.error("Error loading apartment information:", error);
@@ -66,7 +71,12 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
     setFormData({
       ...formData,
       [name]:
-        (name === "floor" || name === "area" || name === "occupants" || name === "vehicleCount") &&
+        (name === "floor" ||
+          name === "area" ||
+          name === "occupants" ||
+          name === "vehicleCount" ||
+          name === "waterUsage" ||
+          name === "electricityUsage") &&
         value !== ""
           ? Number(value)
           : value,
@@ -178,6 +188,37 @@ function EditApartmentForm({ onCancel, onSave, userRole }) {
               name="vehicleCount"
               type="number"
               value={formData.vehicleCount}
+              onChange={handleInputChange}
+              fullWidth
+              disabled={userRole !== "ADMIN"}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Divider sx={{ my: 2 }} />
+            <MDTypography variant="button" fontWeight="bold" color="text">
+              Consumption Index
+            </MDTypography>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <MDInput
+              label="Water Usage"
+              name="waterUsage"
+              type="number"
+              value={formData.waterUsage}
+              onChange={handleInputChange}
+              fullWidth
+              disabled={userRole !== "ADMIN"}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <MDInput
+              label="Electricity Usage"
+              name="electricityUsage"
+              type="number"
+              value={formData.electricityUsage}
               onChange={handleInputChange}
               fullWidth
               disabled={userRole !== "ADMIN"}

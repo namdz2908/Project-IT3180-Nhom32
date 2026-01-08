@@ -207,6 +207,8 @@ export default function useProjectsTableData() {
     apartmentType: "",
     occupants: 0,
     vehicleCount: 0,
+    waterUsage: 0,
+    electricityUsage: 0,
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingApartment, setEditingApartment] = useState({
@@ -217,6 +219,8 @@ export default function useProjectsTableData() {
     apartmentType: "",
     occupants: 0,
     vehicleCount: 0,
+    waterUsage: 0,
+    electricityUsage: 0,
   });
 
   useEffect(() => {
@@ -323,7 +327,12 @@ export default function useProjectsTableData() {
     setEditingApartment((prev) => ({
       ...prev,
       [name]:
-        (name === "floor" || name === "area" || name === "occupants" || name === "vehicleCount") &&
+        (name === "floor" ||
+          name === "area" ||
+          name === "occupants" ||
+          name === "vehicleCount" ||
+          name === "waterUsage" ||
+          name === "electricityUsage") &&
         value !== ""
           ? Number(value)
           : value,
@@ -549,6 +558,24 @@ export default function useProjectsTableData() {
                 name="vehicleCount"
                 type="number"
                 value={editingApartment?.vehicleCount || 0}
+                onChange={handleEditInputChange}
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+              <MDInput
+                label="Water Usage"
+                name="waterUsage"
+                type="number"
+                value={editingApartment?.waterUsage || 0}
+                onChange={handleEditInputChange}
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+              <MDInput
+                label="Electricity Usage"
+                name="electricityUsage"
+                type="number"
+                value={editingApartment?.electricityUsage || 0}
                 onChange={handleEditInputChange}
                 fullWidth
                 inputProps={{ min: 0 }}

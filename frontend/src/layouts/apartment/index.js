@@ -26,6 +26,7 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
+import Icon from "@mui/material/Icon";
 
 // @mui icons
 import HomeIcon from "@mui/icons-material/Home";
@@ -332,7 +333,7 @@ function Apartment() {
                         <MDTypography variant="h6">{apartment.occupants} people</MDTypography>
                       </MDBox>
                     </MDBox>
-                    <MDBox display="flex" alignItems="center">
+                    {/* <MDBox display="flex" alignItems="center">
                       <MDBox mr={1} color="text">
                         <DirectionsCarIcon />
                       </MDBox>
@@ -342,7 +343,7 @@ function Apartment() {
                         </MDTypography>
                         <MDTypography variant="h6">{apartment.vehicleCount} vehicles</MDTypography>
                       </MDBox>
-                    </MDBox>
+                    </MDBox> */}
                   </MDBox>
                   {userRole === "ADMIN" ? (
                     <MDButton
@@ -390,6 +391,19 @@ function Apartment() {
                       <Grid item xs={12} md={6}>
                         <MDBox display="flex" alignItems="center" mb={2}>
                           <MDBox color="info" mr={2}>
+                            <PeopleAltIcon />
+                          </MDBox>
+                          <MDBox>
+                            <MDTypography variant="button" color="text" fontWeight="light">
+                              Owner
+                            </MDTypography>
+                            <MDTypography variant="h6">{apartment.owner || "N/A"}</MDTypography>
+                          </MDBox>
+                        </MDBox>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <MDBox display="flex" alignItems="center" mb={2}>
+                          <MDBox color="info" mr={2}>
                             <MonetizationOnIcon />
                           </MDBox>
                           <MDBox>
@@ -402,16 +416,44 @@ function Apartment() {
                           </MDBox>
                         </MDBox>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} md={6}>
                         <MDBox display="flex" alignItems="center" mb={2}>
                           <MDBox color="info" mr={2}>
-                            <PeopleAltIcon />
+                            <Icon>water_drop</Icon>
                           </MDBox>
                           <MDBox>
                             <MDTypography variant="button" color="text" fontWeight="light">
-                              Owner
+                              Water Usage
                             </MDTypography>
-                            <MDTypography variant="h6">{apartment.owner || "N/A"}</MDTypography>
+                            <MDTypography variant="h6">{apartment.waterUsage || 0} m³</MDTypography>
+                          </MDBox>
+                        </MDBox>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <MDBox display="flex" alignItems="center" mb={2}>
+                          <MDBox color="info" mr={2}>
+                            <Icon>bolt</Icon>
+                          </MDBox>
+                          <MDBox>
+                            <MDTypography variant="button" color="text" fontWeight="light">
+                              Electricity Usage
+                            </MDTypography>
+                            <MDTypography variant="h6">
+                              {apartment.electricityUsage || 0} kWh
+                            </MDTypography>
+                          </MDBox>
+                        </MDBox>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <MDBox display="flex" alignItems="center" mb={2}>
+                          <MDBox color="info" mr={2}>
+                            <DirectionsCarIcon />
+                          </MDBox>
+                          <MDBox>
+                            <MDTypography variant="button" color="text" fontWeight="light">
+                              Vehicles
+                            </MDTypography>
+                            <MDTypography variant="h6">{apartment.vehicleCount || 0}</MDTypography>
                           </MDBox>
                         </MDBox>
                       </Grid>
