@@ -21,6 +21,7 @@ export default function revenueData() {
   const [searchTerm, setSearchTerm] = useState("");
   // const [searchTerm, setsearchTerm] = useState("apartmentId");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
   const [selectedRevenue, setSelectedRevenue] = useState(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -146,6 +147,28 @@ export default function revenueData() {
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
     setSelectedRevenue(null);
+  };
+
+  const handleDeleteAllClick = () => {
+    setDeleteAllDialogOpen(true);
+  };
+
+  const handleDeleteAllConfirm = async () => {
+    try {
+      await axios.delete(`http://localhost:8080/revenue/all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      alert("All invoices deleted successfully!");
+      setDeleteAllDialogOpen(false);
+      loadRevenues();
+    } catch (err) {
+      console.error("Failed to delete all invoices", err);
+      alert("Failed to delete all invoices. Please try again!");
+    }
+  };
+
+  const handleDeleteAllCancel = () => {
+    setDeleteAllDialogOpen(false);
   };
 
   const handleCreateClick = () => {
@@ -398,6 +421,32 @@ export default function revenueData() {
         >
           <Icon>add</Icon> Create Invoice
         </MDButton>
+        <MDButton
+          variant="gradient"
+          color="error"
+          onClick={handleDeleteAllClick}
+          sx={{
+            mr: 2,
+            px: 2,
+            py: 0.75,
+            fontSize: "0.75rem",
+            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            minWidth: "auto",
+            "&:hover": {
+              transform: "translateY(-1px)",
+              boxShadow: "0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)",
+            },
+            "& .material-icons-round": {
+              fontSize: "1.25rem",
+              marginRight: "2px",
+            },
+          }}
+        >
+          <Icon>delete_forever</Icon> delete all
+        </MDButton>
         <MDBox mr={1}>
           <select
             value={searchType}
@@ -556,6 +605,24 @@ export default function revenueData() {
           </MDButton>
           <MDButton onClick={handleDeleteConfirm} color="error">
             Delete
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+      {/* Delete All Dialog */}
+      <Dialog open={deleteAllDialogOpen} onClose={handleDeleteAllCancel}>
+        <DialogTitle>Xóa tất cả hóa đơn</DialogTitle>
+        <DialogContent>
+          <MDTypography>
+            Bạn có chắc chắn muốn xóa **tất cả** hóa đơn trong hệ thống không? Hành động này sẽ đặt
+            lại số dư của tất cả căn hộ về 0 và không thể hoàn tác.
+          </MDTypography>
+        </DialogContent>
+        <DialogActions>
+          <MDButton onClick={handleDeleteAllCancel} color="dark">
+            Hủy
+          </MDButton>
+          <MDButton onClick={handleDeleteAllConfirm} color="error">
+            Xác nhận xóa tất cả
           </MDButton>
         </DialogActions>
       </Dialog>

@@ -85,7 +85,7 @@ public class RevenueService {
 
         // 3. Validate apartment has residents
         if (apartment.getResidents() == null || apartment.getResidents().isEmpty()) {
-            throw new IllegalArgumentException("Cannot create revenue for apartment " + 
+            throw new IllegalArgumentException("Cannot create revenue for apartment " +
                     revenueDTO.getApartmentId() + ": No residents found in this apartment");
         }
 
@@ -93,9 +93,9 @@ public class RevenueService {
         long activeResidentCount = apartment.getResidents().stream()
                 .filter(User::isActive)
                 .count();
-        
+
         if (activeResidentCount == 0) {
-            throw new IllegalArgumentException("Cannot create revenue for apartment " + 
+            throw new IllegalArgumentException("Cannot create revenue for apartment " +
                     revenueDTO.getApartmentId() + ": No active residents in this apartment");
         }
 
@@ -125,7 +125,7 @@ public class RevenueService {
 
         // 10. Set status (default to "Unpaid" if not provided)
         revenue.setStatus(revenueDTO.getStatus() != null ? revenueDTO.getStatus() : "Unpaid");
-        
+
         // 11. Set type
         revenue.setType(revenueDTO.getType());
 
@@ -154,7 +154,7 @@ public class RevenueService {
             apartment.setRevenues(new ArrayList<>());
         }
         apartment.getRevenues().add(revenue);
-        
+
         // 17. Update apartment total
         apartment.setTotal(calculateTotalPayment(apartment.getApartmentId()));
         apartmentRepository.save(apartment);
@@ -179,6 +179,22 @@ public class RevenueService {
         }
 
         revenueRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAllRevenues() {
+        // 1. Get all apartments to reset their totals
+        List<Apartment> apartments = apartmentRepository.findAll();
+        for (Apartment apartment : apartments) {
+            if (apartment.getRevenues() != null) {
+                apartment.getRevenues().clear();
+            }
+            apartment.setTotal(0.0);
+            apartmentRepository.save(apartment);
+        }
+
+        // 2. Delete all records from revenue repository
+        revenueRepository.deleteAll();
     }
 
     @Transactional
@@ -434,7 +450,6 @@ public class RevenueService {
 
         return stats;
     }
-
 
     /**
      * Get revenues created on a specific date

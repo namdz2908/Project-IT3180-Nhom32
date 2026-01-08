@@ -97,6 +97,20 @@ public class RevenueController {
         revenueService.deleteRevenue(id);
         return ResponseEntity.status(HttpStatus.CREATED).body("Revenue delete successfully");
     }
+
+    // Delete all revenues - Admin only
+    @DeleteMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteAllRevenues() {
+        try {
+            revenueService.deleteAllRevenues();
+            return ResponseEntity.ok("All revenues deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete all revenues: " + e.getMessage());
+        }
+    }
     // // xong 1 khoan thu => xoa => can status ??
     // @DeleteMapping("/deleterevenue")
     // public String deleteRevenue(@RequestBody Revenue revenue) {
