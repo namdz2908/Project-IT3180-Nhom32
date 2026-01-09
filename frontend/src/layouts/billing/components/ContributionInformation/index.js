@@ -105,102 +105,103 @@ function ContributionInformation() {
     return `${formattedDay} tháng ${formattedMonth} năm ${year}`;
   };
 
-  // return (
-  //   <Card id="billing-information" sx={{ boxShadow: "none", border: "none" }}>
-  //     <MDBox pt={3} px={2} mb={2}>
-  //       <MDTypography variant="h6" fontWeight="medium">
-  //         Unpaid Contributons
-  //       </MDTypography>
-  //     </MDBox>
+  return (
+    <Card id="billing-information" sx={{ boxShadow: "none", border: "none" }}>
+      <MDBox pt={3} px={2} mb={2}>
+        <MDTypography variant="h6" fontWeight="medium">
+          Unpaid Contributions
+        </MDTypography>
+      </MDBox>
 
-  //     {/* Ô tìm kiếm */}
-  //     <MDBox display="flex" alignItems="center" mb={2}>
-  //       {/* Select tiêu chí tìm kiếm */}
-  //       <MDBox mr={1}>
-  //         <select
-  //           value={searchField}
-  //           onChange={(e) => setSearchField(e.target.value)}
-  //           style={{
-  //             height: "38px",
-  //             padding: "0 15px",
-  //             borderRadius: "8px",
-  //             borderColor: "#d2d6da",
-  //             marginRight: "10px",
-  //             width: "150px",
-  //             fontSize: "14px",
-  //             cursor: "pointer",
-  //             transition: "all 0.2s ease-in-out",
-  //             "&:hover": {
-  //               borderColor: "#1A73E8",
-  //             },
-  //           }}
-  //         >
-  //           <option value="type">Fee Name</option>
-  //           {/* <option value="endDate">Hạn thanh toán</option> */}
-  //         </select>
-  //       </MDBox>
+      {/* Ô tìm kiếm */}
+      <MDBox display="flex" alignItems="center" mb={2}>
+        {/* Select tiêu chí tìm kiếm */}
+        <MDBox mr={1}>
+          <select
+            value={searchField}
+            onChange={(e) => setSearchField(e.target.value)}
+            style={{
+              height: "38px",
+              padding: "0 15px",
+              borderRadius: "8px",
+              borderColor: "#d2d6da",
+              marginRight: "10px",
+              width: "150px",
+              fontSize: "14px",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                borderColor: "#1A73E8",
+              },
+            }}
+          >
+            <option value="type">Fee Name</option>
+            {/* <option value="endDate">Hạn thanh toán</option> */}
+          </select>
+        </MDBox>
 
-  //       {/* Input tìm kiếm */}
-  //       <FormControl fullWidth variant="outlined" size="small">
-  //         <OutlinedInput
-  //           placeholder={`Enter ${
-  //             searchField === "type" ? "fee name" : searchField === "status" ? "status" : "due date"
-  //           }...`}
-  //           value={searchKeyword}
-  //           onChange={(e) => setSearchKeyword(e.target.value)}
-  //         />
-  //       </FormControl>
-  //     </MDBox>
-  //     <MDBox pt={1} px={2}>
-  //       <MDTypography variant="subtitle2" color="black" mb={1}>
-  //         Number of unpaid contributions: <strong>{totalUnpaid}</strong>
-  //       </MDTypography>
-  //     </MDBox>
-  //     <MDBox
-  //       sx={{
-  //         maxHeight: "510px", // Giới hạn chiều cao
-  //         overflowY: "auto", // Thêm thanh cuộn
-  //         border: "1px solid #ddd",
-  //         borderRadius: "8px",
-  //         padding: "0 12px",
-  //         paddingBottom: "16px",
-  //       }}
-  //     >
-  //       <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
-  //         {filteredBills.length > 0 ? (
-  //           filteredBills.map((bill, index) => {
-  //             const fee = fees[bill.type];
-  //             return (
-  //               <Contribution
-  //                 key={bill.id}
-  //                 name={bill.type}
-  //                 total={`${formatCurrency(bill.total)} VND`}
-  //                 fee={fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
-  //                 used={`${formatCurrency(bill.used)} đơn vị`}
-  //                 endDate={`${formatDeadline(bill.endDate)}`}
-  //                 pay={`${bill.status == "Unpaid" ? "Unpaid" : "Paid"}`}
-  //                 noGutter={index === filteredBills.length - 1}
-  //                 bill={bill} // truyền cả bill để dùng khi gửi về backend
-  //                 apartmentId={localStorage.getItem("apartmentId")}
-  //                 setQrCodeData={setQrCodeData}
-  //                 setOpenQRModal={setOpenQRModal}
-  //                 index={index + 1}
-  //               />
-  //             );
-  //           })
-  //         ) : (
-  //           <MDTypography
-  //             variant="caption"
-  //             sx={{ color: "red", display: "flex", paddingTop: "16px" }}
-  //           >
-  //             No matching results.
-  //           </MDTypography>
-  //         )}
-  //       </MDBox>
-  //     </MDBox>
-  //     <QRModal open={openQRModal} onClose={() => setOpenQRModal(false)} qrCodeData={qrCodeData} />
-  //   </Card>
-  // );
+        {/* Input tìm kiếm */}
+        <FormControl fullWidth variant="outlined" size="small">
+          <OutlinedInput
+            placeholder={`Enter ${
+              searchField === "type" ? "fee name" : searchField === "status" ? "status" : "due date"
+            }...`}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+          />
+        </FormControl>
+      </MDBox>
+      <MDBox pt={1} px={2}>
+        <MDTypography variant="subtitle2" color="black" mb={1}>
+          Number of unpaid contributions: <strong>{totalUnpaid}</strong>
+        </MDTypography>
+      </MDBox>
+      <MDBox
+        sx={{
+          maxHeight: "510px", // Giới hạn chiều cao
+          overflowY: "auto", // Thêm thanh cuộn
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "0 12px",
+          paddingBottom: "16px",
+        }}
+      >
+        <MDBox component="ul" display="flex" flexDirection="column" p={0} m={0}>
+          {filteredBills.length > 0 ? (
+            filteredBills.map((bill, index) => {
+              const fee = fees[bill.type];
+              return (
+                <Contribution
+                  key={bill.id}
+                  name={bill.type}
+                  company="Management Board"
+                  total={`${formatCurrency(bill.total)} VND`}
+                  fee={fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
+                  used={`${formatCurrency(bill.used)} đơn vị`}
+                  endDate={`${formatDeadline(bill.endDate)}`}
+                  pay={`${bill.status == "Unpaid" ? "Unpaid" : "Paid"}`}
+                  noGutter={index === filteredBills.length - 1}
+                  bill={bill} // truyền cả bill để dùng khi gửi về backend
+                  apartmentId={localStorage.getItem("apartmentId")}
+                  setQrCodeData={setQrCodeData}
+                  setOpenQRModal={setOpenQRModal}
+                  index={index + 1}
+                />
+              );
+            })
+          ) : (
+            <MDTypography
+              variant="caption"
+              sx={{ color: "red", display: "flex", paddingTop: "16px" }}
+            >
+              No matching results.
+            </MDTypography>
+          )}
+        </MDBox>
+      </MDBox>
+      <QRModal open={openQRModal} onClose={() => setOpenQRModal(false)} qrCodeData={qrCodeData} />
+    </Card>
+  );
 }
 
 export default ContributionInformation;

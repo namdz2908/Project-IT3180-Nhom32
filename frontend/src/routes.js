@@ -132,6 +132,24 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Contribution Management",
+    key: "contribution",
+    icon: <Icon fontSize="small">monetization_on</Icon>,
+    route: "/contribution",
+    component:
+      userRole === "USER" ? (
+        () => (
+          <div style={{ padding: 32, fontSize: 24 }}>
+            You don&apos;t have permission to access this
+          </div>
+        )
+      ) : (
+        <UserContributionTable />
+      ),
+    hidden: !token || userRole === "USER",
+  },
+  {
+    type: "collapse",
     name: "Notification Management",
     key: "notification",
     icon: <Icon fontSize="small">notifications</Icon>,
@@ -203,15 +221,6 @@ const routes = [
     route: "/payment/complete/:paymentToken",
     component: <PaymentComplete />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Contribution",
-  //   key: "contribution",
-  //   icon: <Icon fontSize="small">monetization_on</Icon>,
-  //   route: "/contribution",
-  //   component: <UserContributionTable />,
-  //   hidden: !token,
-  // },
   // {
   //   type: "collapse",
   //   name: "Sign Up",
