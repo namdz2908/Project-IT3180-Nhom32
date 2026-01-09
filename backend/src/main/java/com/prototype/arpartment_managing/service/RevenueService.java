@@ -202,6 +202,11 @@ public class RevenueService {
         return revenueRepository.findById(id)
                 .map(existingRevenue -> {
                     // Update status
+                    if ("Paid".equals(revenueDTO.getStatus()) && !"Paid".equals(existingRevenue.getStatus())) {
+                        existingRevenue.setPaidDate(LocalDateTime.now());
+                    } else if ("Unpaid".equals(revenueDTO.getStatus())) {
+                        existingRevenue.setPaidDate(null);
+                    }
                     existingRevenue.setStatus(revenueDTO.getStatus());
 
                     // Update used value if provided

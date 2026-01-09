@@ -21,26 +21,28 @@ public class RevenueDTO {
     private double used;
 
     private double total;
-    
+
     private LocalDateTime createDate;
-    
+
     private LocalDateTime endDate;
 
-    private String dueDate;        // Thêm ISO string cho frontend
-    
-    private String apartmentName;  // Thêm Tên căn hộ
-    
+    private LocalDateTime paidDate;
+
+    private String dueDate; // Thêm ISO string cho frontend
+
+    private String apartmentName; // Thêm Tên căn hộ
+
     // Constructor without dependencies
     public RevenueDTO() {
     }
-    
+
     // Constructor that takes a Revenue and Apartment
     public RevenueDTO(Revenue revenue, Apartment apartment) {
         this.id = revenue.getId();
         this.type = revenue.getType();
         this.status = revenue.getStatus();
         this.apartmentId = (revenue.getApartment() != null) ? revenue.getApartment().getApartmentId() : null;
-        
+
         // Calculate used value based on type
         if ("Service".equals(this.type) && apartment != null) {
             this.used = apartment.getArea();
@@ -50,18 +52,19 @@ public class RevenueDTO {
         this.total = revenue.getTotal();
         this.createDate = revenue.getCreateDate();
         this.endDate = revenue.getEndDate();
+        this.paidDate = revenue.getPaidDate();
 
         // THÊM 2 DÒNG NÀY
         this.dueDate = (this.endDate != null) ? this.endDate.toString() : null;
         this.apartmentName = (apartment != null) ? apartment.getApartmentId() : "Unknown";
     }
 
-    public String getDueDate() { 
-        return dueDate; 
+    public String getDueDate() {
+        return dueDate;
     }
 
-    public void setDueDate(String dueDate) { 
-        this.dueDate = dueDate; 
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
     }
 
     public long getId() {
@@ -126,5 +129,13 @@ public class RevenueDTO {
 
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public LocalDateTime getPaidDate() {
+        return paidDate;
+    }
+
+    public void setPaidDate(LocalDateTime paidDate) {
+        this.paidDate = paidDate;
     }
 }
