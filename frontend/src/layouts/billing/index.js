@@ -122,7 +122,7 @@ function Billing() {
                     </MDBox>
                     <MDBox px={2} py={1}>
                       <BillingInformation />
-                      <ContributionInformation />
+                      {/* <ContributionInformation /> */}
                       {/* <PaidBills /> */}
                     </MDBox>
                   </Card>
