@@ -155,14 +155,14 @@ function Contribution({
             </MDTypography>
           </MDTypography>
         </MDBox> */}
-        {/* <MDBox mb={1} lineHeight={0}>
+        <MDBox mb={1} lineHeight={0}>
           <MDTypography variant="caption" color="text">
-            Ngày cuối cùng phải nộp:&nbsp;&nbsp;&nbsp;
+            Due date:&nbsp;&nbsp;&nbsp;
             <MDTypography variant="caption" fontWeight="medium" color="error">
               {endDate}
             </MDTypography>
           </MDTypography>
-        </MDBox> */}
+        </MDBox>
         <MDBox mb={1} lineHeight={0}>
           <MDTypography variant="caption" color="text">
             Status:&nbsp;&nbsp;&nbsp;

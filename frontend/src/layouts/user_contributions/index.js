@@ -278,12 +278,14 @@ function UserContributions() {
                       <TableHead>
                         <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                           <TableCell
+                            align="center"
                             sx={{
                               padding: "12px 16px",
                               fontSize: "14px",
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "5%",
                             }}
                           >
                             No.
@@ -295,50 +297,59 @@ function UserContributions() {
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "25%",
                             }}
                           >
                             Contribution Type
                           </TableCell>
                           <TableCell
+                            align="center"
                             sx={{
                               padding: "12px 16px",
                               fontSize: "14px",
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "15%",
                             }}
                           >
                             Amount (VND)
                           </TableCell>
                           <TableCell
+                            align="center"
                             sx={{
                               padding: "12px 16px",
                               fontSize: "14px",
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "15%",
                             }}
                           >
                             Unit Used
                           </TableCell>
                           <TableCell
+                            align="center"
                             sx={{
                               padding: "12px 16px",
                               fontSize: "14px",
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "20%",
                             }}
                           >
-                            Payment Deadline
+                            Paid date
                           </TableCell>
                           <TableCell
+                            align="center"
                             sx={{
                               padding: "12px 16px",
                               fontSize: "14px",
                               fontWeight: "bold",
                               color: "#333",
                               borderBottom: "1px solid #ddd",
+                              width: "15%",
                             }}
                           >
                             Status
@@ -357,6 +368,7 @@ function UserContributions() {
                             }}
                           >
                             <TableCell
+                              align="center"
                               sx={{
                                 padding: "12px 16px",
                                 fontSize: "14px",
@@ -375,6 +387,7 @@ function UserContributions() {
                               {bill.type}
                             </TableCell>
                             <TableCell
+                              align="center"
                               sx={{
                                 padding: "12px 16px",
                                 fontSize: "14px",
@@ -385,6 +398,7 @@ function UserContributions() {
                               {formatCurrency(bill.total)}
                             </TableCell>
                             <TableCell
+                              align="center"
                               sx={{
                                 padding: "12px 16px",
                                 fontSize: "14px",
@@ -394,15 +408,17 @@ function UserContributions() {
                               {formatCurrency(bill.used)} units
                             </TableCell>
                             <TableCell
+                              align="center"
                               sx={{
                                 padding: "12px 16px",
                                 fontSize: "14px",
                                 color: "#666",
                               }}
                             >
-                              {formatDeadline(bill.endDate)}
+                              {formatDeadline(bill.paidDate || bill.endDate)}
                             </TableCell>
                             <TableCell
+                              align="center"
                               sx={{
                                 padding: "12px 16px",
                                 fontSize: "14px",
