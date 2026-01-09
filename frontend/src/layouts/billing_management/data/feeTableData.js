@@ -7,7 +7,7 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import MDAlert from "components/MDAlert";
 
-export default function data() {
+export default function useFeeData() {
   const [fees, setFees] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedFee, setSelectedFee] = useState(null);

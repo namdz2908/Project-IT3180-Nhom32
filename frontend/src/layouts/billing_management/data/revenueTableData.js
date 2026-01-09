@@ -13,7 +13,7 @@ import MDInput from "components/MDInput";
 //ApartmentSelectTable
 import ApartmentSelectTable from "layouts/billing_management/data/apartmentSelectTable";
 
-export default function revenueData() {
+export default function useRevenueData() {
   const [fees, setFees] = useState([]);
   const [feeTypes, setFeeTypes] = useState([]);
   const [revenues, setRevenues] = useState([]);
@@ -24,6 +24,8 @@ export default function revenueData() {
   const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
   const [selectedRevenue, setSelectedRevenue] = useState(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [generateConfirmOpen, setGenerateConfirmOpen] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [filteredRevenue, setFilteredRevenue] = useState([]);
   const [createError, setCreateError] = useState("");
@@ -147,6 +149,33 @@ export default function revenueData() {
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
     setSelectedRevenue(null);
+  };
+
+  const handleGenerateMonthlyClick = () => {
+    setGenerateConfirmOpen(true);
+  };
+
+  const handleGenerateMonthlyConfirm = async () => {
+    setGenerating(true);
+    try {
+      const response = await axios.post(`http://localhost:8080/revenue/generate-monthly`, null, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      alert(
+        `Thành công! Đã tạo ${response.data.revenuesCreated} hóa đơn mới cho tất cả các căn hộ.`
+      );
+      setGenerateConfirmOpen(false);
+      loadRevenues();
+    } catch (err) {
+      console.error("Failed to generate monthly revenues", err);
+      alert("Lỗi khi tạo hóa đơn tự động: " + (err.response?.data || err.message));
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleGenerateMonthlyCancel = () => {
+    setGenerateConfirmOpen(false);
   };
 
   const handleDeleteAllClick = () => {
@@ -685,6 +714,21 @@ export default function revenueData() {
                 }}
                 fullWidth
               />
+              <MDBox mt={2}>
+                <MDButton
+                  variant="gradient"
+                  color="info"
+                  fullWidth
+                  onClick={handleGenerateMonthlyClick}
+                  disabled={generating}
+                >
+                  {generating ? "Đang xử lý..." : "Tạo hóa đơn tháng cho tất cả các căn hộ"}
+                </MDButton>
+                <MDTypography variant="caption" color="text" sx={{ mt: 1, display: "block" }}>
+                  * Chức năng này sẽ tự động tính toán và tạo hóa đơn (Dịch vụ, Điện, Nước, Xe) cho
+                  tất cả các căn hộ đang có cư dân hoạt động.
+                </MDTypography>
+              </MDBox>
             </MDBox>
 
             <MDBox flex={2}>
@@ -701,6 +745,38 @@ export default function revenueData() {
           </MDButton>
           <MDButton onClick={handleCreateSubmit} color="success">
             Create
+          </MDButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manual Monthly Generation Confirmation Dialog */}
+      <Dialog open={generateConfirmOpen} onClose={handleGenerateMonthlyCancel}>
+        <DialogTitle>Xác nhận tạo hóa đơn hàng tháng</DialogTitle>
+        <DialogContent>
+          <MDTypography variant="body2">
+            Bạn có chắc chắn muốn kích hoạt quy trình tạo hóa đơn tự động cho tất cả các căn hộ ngay
+            bây giờ không?
+            <br />
+            <br />
+            <strong>Lưu ý:</strong>
+            <ul>
+              <li>Hệ thống sẽ dựa trên diện tích và chỉ số tiêu thụ hiện tại.</li>
+              <li>Các chỉ số Điện, Nước sẽ được reset về 0 sau khi hoàn tất.</li>
+              <li>Hành động này không thể hoàn tác.</li>
+            </ul>
+          </MDTypography>
+        </DialogContent>
+        <DialogActions>
+          <MDButton onClick={handleGenerateMonthlyCancel} color="dark">
+            Hủy bỏ
+          </MDButton>
+          <MDButton
+            onClick={handleGenerateMonthlyConfirm}
+            color="success"
+            variant="gradient"
+            disabled={generating}
+          >
+            {generating ? "Đang tạo..." : "Xác nhận tạo"}
           </MDButton>
         </DialogActions>
       </Dialog>

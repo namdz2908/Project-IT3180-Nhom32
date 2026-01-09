@@ -29,12 +29,12 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import feeTableData from "layouts/billing_management/data/feeTableData";
-import revenueTableData from "layouts/billing_management/data/revenueTableData";
+import useFeeData from "layouts/billing_management/data/feeTableData";
+import useRevenueData from "layouts/billing_management/data/revenueTableData";
 
 function BillingTable() {
-  const { columns, rows, searchUI } = feeTableData();
-  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = revenueTableData();
+  const { columns, rows, searchUI } = useFeeData();
+  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = useRevenueData();
 
   return (
     <DashboardLayout>
