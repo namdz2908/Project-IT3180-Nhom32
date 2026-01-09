@@ -3,8 +3,20 @@ import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, Box } from "@mui/material";
-import Bill from "layouts/billing/components/Paid";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Icon,
+} from "@mui/material";
 import { getRevenue, getFeeByType } from "../../api";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -68,6 +80,12 @@ function PaidBills() {
   const filteredBills = bills
     .filter((bill) => bill.status === "Paid") // Only get paid bills
     .filter((bill) => {
+      const fee = fees[bill.type];
+      // Nếu đã load được phí và giá là 1 (Contribution) thì loại bỏ
+      if (fee && fee.pricePerUnit === 1) return false;
+      return true;
+    })
+    .filter((bill) => {
       const value = bill[searchField]?.toLowerCase() || "";
       return value.includes(searchKeyword.toLowerCase());
     });
@@ -98,50 +116,223 @@ function PaidBills() {
     return `${formattedDay}/${formattedMonth}/${year}`;
   };
   return (
-    <MDBox mt={3}>
-      <MDTypography variant="h6" gutterBottom color="success" mb={1}>
-        Paid Fees: <strong>{totalPaid}</strong>
-      </MDTypography>
+    <Card>
       <MDBox
-        component="ul"
+        mx={2}
+        mt={-3}
+        py={3}
+        px={2}
+        variant="gradient"
+        bgColor="success"
+        borderRadius="lg"
+        coloredShadow="success"
         display="flex"
-        flexDirection="column"
-        p={0}
-        m={0}
-        sx={{
-          maxHeight: "815px", // Max height, adjustable
-          overflowY: "auto", // Allow vertical scroll
-          pr: 1, // Right padding to avoid content being hidden by scrollbar
-        }}
+        justifyContent="space-between"
+        alignItems="center"
       >
-        {filteredBills.length > 0 ? (
-          filteredBills.map((bill, index) => {
-            const fee = fees[bill.type];
-            return (
-              <Bill
-                key={bill.id}
-                name={bill.type}
-                total={`${formatCurrency(bill.total)} VND`}
-                fee={fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
-                used={`${formatCurrency(bill.used)} units`}
-                paidDate={`${formatDeadline(bill.paidDate)}`}
-                pay={`${bill.status == "Unpaid" ? "Unpaid" : "Paid"}`}
-                noGutter={index === filteredBills.length - 1}
-                bill={bill} // truyền cả bill để dùng khi gửi về backend
-                apartmentId={localStorage.getItem("apartmentId")}
-                setQrCodeData={setQrCodeData}
-                setOpenQRModal={setOpenQRModal}
-                index={index + 1}
-              />
-            );
-          })
-        ) : (
-          <MDTypography variant="body2" color="textSecondary">
-            No matching results.
+        <MDBox>
+          <MDTypography variant="h6" color="white" sx={{ display: "flex", alignItems: "center" }}>
+            <Icon sx={{ mr: 1 }}>check_circle</Icon>
+            Paid Fees
           </MDTypography>
-        )}
+          <MDTypography variant="button" color="white" opacity={0.8}>
+            History of your paid contributions and fees
+          </MDTypography>
+        </MDBox>
       </MDBox>
-    </MDBox>
+      <MDBox px={3} py={3}>
+        <MDBox display="flex" alignItems="center" mb={2}>
+          <MDBox mr={1}>
+            <select
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+              style={{
+                height: "38px",
+                padding: "0 15px",
+                borderRadius: "8px",
+                borderColor: "#d2d6da",
+                marginRight: "10px",
+                width: "150px",
+                fontSize: "14px",
+                cursor: "pointer",
+              }}
+            >
+              <option value="type">Fee Name</option>
+            </select>
+          </MDBox>
+
+          <FormControl fullWidth variant="outlined" size="small">
+            <OutlinedInput
+              placeholder="Enter fee name..."
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+            />
+          </FormControl>
+        </MDBox>
+
+        <MDBox pt={1} mb={2}>
+          <MDTypography variant="subtitle2" color="black">
+            Number of paid fees: <strong>{totalPaid}</strong>
+          </MDTypography>
+        </MDBox>
+
+        <MDBox
+          sx={{
+            maxHeight: "510px",
+            overflowY: "auto",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+          }}
+        >
+          <Table sx={{ minWidth: "100%" }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "5%",
+                  }}
+                >
+                  No.
+                </TableCell>
+                <TableCell
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "20%",
+                  }}
+                >
+                  Type
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "20%",
+                  }}
+                >
+                  Total amount
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "20%",
+                  }}
+                >
+                  Price per unit
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "15%",
+                  }}
+                >
+                  Units used
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    borderBottom: "1px solid #ddd",
+                    width: "15%",
+                  }}
+                >
+                  Paid date
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredBills.length > 0 ? (
+                filteredBills.map((bill, index) => {
+                  const fee = fees[bill.type];
+                  return (
+                    <TableRow
+                      key={bill.id}
+                      sx={{
+                        "&:hover": { backgroundColor: "#f9f9f9" },
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      <TableCell
+                        align="center"
+                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
+                      >
+                        {index + 1}
+                      </TableCell>
+                      <TableCell sx={{ padding: "12px 16px", fontSize: "14px", color: "#333" }}>
+                        {bill.type}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          padding: "12px 16px",
+                          fontSize: "14px",
+                          color: "#333",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {formatCurrency(bill.total)} VND
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#333" }}
+                      >
+                        {fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
+                      >
+                        {formatCurrency(bill.used)} units
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
+                      >
+                        {formatDeadline(bill.paidDate)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                    <MDTypography variant="body2" color="textSecondary">
+                      No matching results.
+                    </MDTypography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </MDBox>
+      </MDBox>
+    </Card>
   );
 }
 

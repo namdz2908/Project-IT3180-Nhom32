@@ -123,15 +123,16 @@ function Billing() {
                     <MDBox px={2} py={1}>
                       <BillingInformation />
                       {/* <ContributionInformation /> */}
-                      {/* <PaidBills /> */}
                     </MDBox>
                   </Card>
+                </Grid>
+                <Grid item xs={12}>
+                  <PaidBills />
                 </Grid>
               </Grid>
             </Grid>
             <Grid item xs={12} lg={4}>
               <Calendar revenues={revenues} daysAhead={7} />
-              <PaidBills />
             </Grid>
           </Grid>
         </MDBox>
