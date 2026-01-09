@@ -428,7 +428,7 @@ export default function useProjectsTableData() {
       { Header: "Floor", accessor: "floor", width: "15%", align: "center" },
       { Header: "Occupants", accessor: "occupants", width: "15%", align: "center" },
       { Header: "Area", accessor: "area", width: "15%", align: "center" },
-      { Header: "Vehicles", accessor: "vehicles", width: "13%", align: "center" },
+      // { Header: "Vehicles", accessor: "vehicles", width: "13%", align: "center" },
       { Header: "Type", accessor: "type", width: "12%", align: "center" },
       { Header: "Action", accessor: "action", width: "10%", align: "center" },
     ],
