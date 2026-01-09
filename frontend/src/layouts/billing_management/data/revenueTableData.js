@@ -643,7 +643,7 @@ export default function revenueData() {
         <DialogContent>
           <MDBox display="flex" flexDirection="row" gap={2}>
             <MDBox display="flex" flexDirection="column" gap={2} flex={1}>
-              <DialogTitle>Create Fee</DialogTitle>
+              <DialogTitle>Create Invoice</DialogTitle>
               <MDBox fullWidth label="Type">
                 <select
                   name="type"
