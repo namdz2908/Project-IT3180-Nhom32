@@ -72,6 +72,11 @@ public class ApartmentService {
             throw new IllegalArgumentException(
                     "Apartment with number '" + apartment.getApartmentId() + "' already exists");
         }
+
+        // Automatically set serviceUsage equal to area upon creation (casting Float to
+        // Double)
+        apartment.setServiceUsage(apartment.getArea().doubleValue());
+
         return apartmentRepository.save(apartment);
     }
 
