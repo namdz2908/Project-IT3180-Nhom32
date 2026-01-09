@@ -49,6 +49,7 @@ import ApartmentManagement from "layouts/apartment_management";
 import NotificationTable from "layouts/notification_management";
 import UserNotificationPage from "layouts/notification";
 import UserContributionTable from "layouts/contribution";
+import UserContributions from "layouts/user_contributions";
 import { jwtDecode } from "jwt-decode";
 
 // @mui icons
@@ -174,6 +175,15 @@ const routes = [
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/billing",
     component: <Billing />,
+    hidden: !token,
+  },
+  {
+    type: "collapse",
+    name: "Contributions",
+    key: "user-contributions",
+    icon: <Icon fontSize="small">volunteer_activism</Icon>,
+    route: "/contributions",
+    component: userRole === "ADMIN" ? <UserContributionTable /> : <UserContributions />,
     hidden: !token,
   },
   {
