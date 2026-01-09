@@ -216,6 +216,13 @@ public class RevenueController {
         return revenueService.getRevenuesNotContribution(apartmentId);
     }
 
+    // Get all contributions for Admin
+    @GetMapping("/contribution/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<RevenueDTO> getAllContributionsForAdmin() {
+        return revenueService.getAllContributionsForAdmin();
+    }
+
     // Manually trigger revenue generation for testing - Admin only
     @PostMapping("/generate-monthly")
     @PreAuthorize("hasRole('ADMIN')")
@@ -244,6 +251,27 @@ public class RevenueController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to generate monthly revenues: " + e.getMessage());
+        }
+    }
+
+    // Manually trigger overdue contribution deletion for testing - Admin only
+    @PostMapping("/delete-overdue-contributions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteOverdueContributions() {
+        try {
+            int deletedCount = revenueService.deleteOverdueContributions();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Overdue contribution deletion triggered successfully");
+            response.put("contributionsDeleted", deletedCount);
+            response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete overdue contributions: " + e.getMessage());
         }
     }
 

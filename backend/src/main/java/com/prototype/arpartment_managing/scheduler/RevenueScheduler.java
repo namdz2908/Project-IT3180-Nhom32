@@ -260,4 +260,37 @@ public class RevenueScheduler {
     public void manuallyTriggerRevenueGeneration() {
         generateMonthlyRevenues();
     }
+
+    /**
+     * Automatically delete overdue contributions every day at 00:05 AM
+     * Contributions (fees with pricePerUnit = 1) that are past their due date
+     * and still unpaid will be automatically deleted
+     * 
+     * Cron expression: 0 5 0 * * ?
+     * - 0 seconds
+     * - 5 minutes
+     * - 0 hours (midnight)
+     * - * = Every day of month
+     * - * = Every month
+     * - ? = Any day of week
+     */
+    @Scheduled(cron = "0 5 0 * * ?")
+    public void deleteOverdueContributions() {
+        logger.info("Starting automatic overdue contribution deletion at {}", LocalDateTime.now());
+
+        try {
+            int deletedCount = revenueService.deleteOverdueContributions();
+            logger.info("Overdue contribution deletion completed: {} contributions deleted", deletedCount);
+        } catch (Exception e) {
+            logger.error("Error in overdue contribution deletion process: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * For testing: Manually trigger the overdue contribution deletion
+     * Can be called from a controller endpoint for manual testing
+     */
+    public void manuallyTriggerOverdueContributionDeletion() {
+        deleteOverdueContributions();
+    }
 }

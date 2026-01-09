@@ -2,16 +2,30 @@ import { useEffect, useState } from "react";
 import Icon from "@mui/material/Icon";
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
-import { getAllInvoices, getContribution } from "../../billing/api";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { jwtDecode } from "jwt-decode";
+import { getAllInvoices, getContribution, getAllContributionsForAdmin } from "../../billing/api";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 
 //ApartmentSelectTable
+import ApartmentSelectTable from "layouts/billing_management/data/apartmentSelectTable";
+
 export default function userContributionData({ apartmentId }) {
+  const token = localStorage.getItem("token");
+  let userRole = null;
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      userRole = decoded.role || null;
+    } catch (error) {
+      console.error("Invalid token:", error);
+    }
+  }
+
   const [revenues, setRevenues] = useState([]);
   const [rows, setRows] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,7 +87,13 @@ export default function userContributionData({ apartmentId }) {
   };
 
   const loadRevenues = async () => {
-    const data = await getContribution(apartmentId);
+    let data;
+    if (userRole === "ADMIN") {
+      data = await getAllContributionsForAdmin();
+    } else {
+      data = await getContribution(apartmentId);
+    }
+
     // const filteredData = handleSearch(data)
     setRevenues(data);
     setFilteredRevenue(data);
@@ -152,28 +172,54 @@ export default function userContributionData({ apartmentId }) {
       used: "",
       endDate: "",
     });
+    setSelectedApartments(new Set());
   };
 
   const handleCreateSubmit = async () => {
     try {
-      // if (newRevenue.endDate != null) {
-      //   newRevenue.endDate = new Date(newRevenue.endDate).toISOString();
-      // }
-      //Đoạn sửa
-      const converted = {
-        ...newRevenue,
-        apartmentId: apartmentId,
-      };
-      console.log("newconvertedRevenue:", converted);
-      await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      alert("Create contribution successfully!");
+      // Kiểm tra xem có căn hộ nào được chọn không
+      if (selectedApartments.size === 0) {
+        alert("Please select at least one apartment to send the contribution!");
+        return;
+      }
+
+      // Validate type
+      if (!newRevenue.type || newRevenue.type.trim() === "") {
+        alert("Please select a contribution type!");
+        return;
+      }
+
+      // Validate used amount
+      if (
+        !newRevenue.used ||
+        isNaN(parseFloat(newRevenue.used)) ||
+        parseFloat(newRevenue.used) <= 0
+      ) {
+        alert("Please enter a valid contribution amount (must be greater than 0)!");
+        return;
+      }
+
+      // Gửi contribution tới từng căn hộ được chọn
+      for (const id of selectedApartments) {
+        const converted = {
+          type: newRevenue.type,
+          status: "Unpaid",
+          used: parseFloat(newRevenue.used), // Chuyển đổi sang number
+          apartmentId: id,
+          endDate: newRevenue.endDate ? new Date(newRevenue.endDate).toISOString() : null, // Due date
+        };
+        console.log("newconvertedContribution:", converted);
+        await axios.post("http://localhost:8080/revenue/create-with-qr", converted, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+      }
+      alert(`Create contribution successfully for ${selectedApartments.size} apartment(s)!`);
       loadRevenues();
       handleCreateClose();
     } catch (error) {
-      console.error("Failed to create Revenue", error);
-      alert("Failed to create revenue. Please try again!");
+      console.error("Failed to create Contribution", error);
+      const errorMsg = error.response?.data || "Failed to create contribution. Please try again!";
+      alert(errorMsg);
     }
   };
 
@@ -220,18 +266,15 @@ export default function userContributionData({ apartmentId }) {
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (editRevenue.status?.toString().toLowerCase() === "paid") {
-      alert("You can't edit the paid one");
-      return;
-    }
-
     setEditRevenue((prev) => ({ ...prev, [name]: value }));
   };
 
   const columns = [
     { Header: "ID", accessor: "id", width: "5%" },
     { Header: "Type", accessor: "type", width: "20%" },
+    ...(userRole === "ADMIN"
+      ? [{ Header: "Apartment", accessor: "apartment", width: "15%", align: "center" }]
+      : []),
     { Header: "Total", accessor: "total", width: "15%", align: "center" },
     { Header: "Status", accessor: "status", width: "15%", align: "center" },
     // { Header: "ID căn hộ", accessor: "apartmentId", width: "15%", align: "center" },
@@ -276,6 +319,11 @@ export default function userContributionData({ apartmentId }) {
           {bill.type}
         </MDTypography>
       ),
+      apartment: (
+        <MDTypography variant="caption" fontWeight="medium">
+          {bill.apartmentId || "N/A"}
+        </MDTypography>
+      ),
       total: <MDTypography variant="caption">{formatCurrency(bill.total)}</MDTypography>,
       status: (
         <MDBox color={bill.status === "Paid" ? "success" : "error"}>
@@ -286,16 +334,7 @@ export default function userContributionData({ apartmentId }) {
       // apartmentId: bill.apartmentId,
       action: (
         <MDBox display="flex" gap={1}>
-          <MDButton
-            variant="text"
-            color="info"
-            onClick={() => handleEditClick(bill)}
-            disabled={bill.status?.toLowerCase().trim() === "paid"}
-            sx={{
-              opacity: bill.status?.toLowerCase().trim() === "paid" ? 0.5 : 1,
-              pointerEvents: bill.status?.toLowerCase().trim() === "paid" ? "none" : "auto",
-            }}
-          >
+          <MDButton variant="text" color="info" onClick={() => handleEditClick(bill)}>
             <Icon>edit</Icon>
           </MDButton>
           <MDButton variant="text" color="error" onClick={() => handleDeleteClick(bill)}>
@@ -456,6 +495,30 @@ export default function userContributionData({ apartmentId }) {
               disabled
               fullWidth
             />
+            <MDBox mt={1}>
+              <MDTypography variant="caption" fontWeight="bold">
+                Status
+              </MDTypography>
+              <select
+                name="status"
+                value={editRevenue.status}
+                onChange={handleEditInputChange}
+                style={{
+                  height: "42px",
+                  padding: "0 10px",
+                  borderRadius: "8px",
+                  borderColor: "#d2d6da",
+                  width: "100%",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  marginTop: "8px",
+                }}
+              >
+                <option value="Unpaid">Unpaid</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </MDBox>
           </MDBox>
         </DialogContent>
         <DialogActions>
@@ -488,18 +551,18 @@ export default function userContributionData({ apartmentId }) {
         open={createDialogOpen}
         onClose={handleCreateClose}
         fullWidth
-        maxWidth="md" // hoặc 'lg', hoặc 'xl'
+        maxWidth="md"
         PaperProps={{
           sx: {
-            width: "40%", // tùy chỉnh tỉ lệ chiều rộng
-            maxWidth: "1500px", // hoặc giá trị bạn muốn
+            width: "90%",
+            maxWidth: "1500px",
           },
         }}
       >
         <DialogContent>
           <MDBox display="flex" flexDirection="row" gap={2}>
             <MDBox display="flex" flexDirection="column" gap={2} flex={1}>
-              <DialogTitle>Create Contribition</DialogTitle>
+              <DialogTitle>Create Contribution</DialogTitle>
               <MDBox fullWidth label="Type">
                 <select
                   name="type"
@@ -523,13 +586,6 @@ export default function userContributionData({ apartmentId }) {
                   ))}
                 </select>
               </MDBox>
-              {/* <MDInput
-                label="Type"
-                name="type"
-                value={newRevenue.type}
-                onChange={handleInputChange}
-                fullWidth
-              /> */}
               <MDInput
                 label="Contribution amount"
                 name="used"
@@ -537,23 +593,26 @@ export default function userContributionData({ apartmentId }) {
                 onChange={handleInputChange}
                 fullWidth
               />
-              {/* <MDInput
-                label="Ngày hết hạn"
+              <MDInput
+                label="Due date"
                 name="endDate"
                 type="date"
-                value={newRevenue.endDate}
+                value={newRevenue.endDate || ""}
                 onChange={handleInputChange}
+                inputProps={{
+                  min: new Date().toISOString().split("T")[0],
+                }}
                 InputLabelProps={{ shrink: true }}
                 fullWidth
-              /> */}
+              />
             </MDBox>
 
-            {/* <MDBox flex={2}>
+            <MDBox flex={2}>
               <ApartmentSelectTable
                 selectedApartments={selectedApartments}
                 setSelectedApartments={setSelectedApartments}
               />
-            </MDBox> */}
+            </MDBox>
           </MDBox>
         </DialogContent>
         <DialogActions>

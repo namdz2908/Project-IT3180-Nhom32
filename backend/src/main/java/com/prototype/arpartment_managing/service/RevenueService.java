@@ -384,6 +384,30 @@ public class RevenueService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get all contributions from all apartments (for Admin)
+     * Contributions are revenues with fee pricePerUnit = 1
+     */
+    public List<RevenueDTO> getAllContributionsForAdmin() {
+        List<Revenue> allRevenues = revenueRepository.findAll();
+
+        List<Revenue> contributions = new java.util.ArrayList<>();
+        for (Revenue re : allRevenues) {
+            String type = re.getType();
+            if (feeService.getFeeByType(type).isPresent()) {
+                if (feeService.getFeeByType(type).get().getPricePerUnit() == 1) {
+                    contributions.add(re);
+                }
+            }
+        }
+        return contributions.stream()
+                .map(revenue -> {
+                    Apartment apartment = revenue.getApartment();
+                    return new RevenueDTO(revenue, apartment);
+                })
+                .collect(Collectors.toList());
+    }
+
     public List<RevenueDTO> getRevenuesNotContribution(String apartmentId) {
         List<Revenue> revenues = revenueRepository.findByApartment_ApartmentId(apartmentId);
         List<Revenue> contributions = new java.util.ArrayList<>(List.of());
@@ -474,5 +498,37 @@ public class RevenueService {
         return revenues.stream()
                 .map(revenue -> new RevenueDTO(revenue, revenue.getApartment()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Delete overdue contributions (contribution = fee with pricePerUnit = 1)
+     * This method finds all unpaid revenues that are past their due date
+     * and deletes only the ones that are contributions
+     * 
+     * @return number of deleted contributions
+     */
+    @Transactional
+    public int deleteOverdueContributions() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Revenue> overdueRevenues = revenueRepository.findOverdueUnpaidRevenues(now);
+
+        int deletedCount = 0;
+        for (Revenue revenue : overdueRevenues) {
+            String type = revenue.getType();
+            // Check if this is a contribution (pricePerUnit = 1)
+            Optional<Fee> feeOpt = feeService.getFeeByType(type);
+            if (feeOpt.isPresent() && feeOpt.get().getPricePerUnit() == 1) {
+                // This is a contribution, delete it
+                try {
+                    deleteRevenue(revenue.getId());
+                    deletedCount++;
+                } catch (Exception e) {
+                    // Log error but continue with other deletions
+                    System.err.println(
+                            "Failed to delete overdue contribution ID " + revenue.getId() + ": " + e.getMessage());
+                }
+            }
+        }
+        return deletedCount;
     }
 }

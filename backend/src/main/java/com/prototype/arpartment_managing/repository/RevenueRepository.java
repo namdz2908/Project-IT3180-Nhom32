@@ -12,31 +12,35 @@ import java.util.Optional;
 
 @Repository
 public interface RevenueRepository extends JpaRepository<Revenue, Long> {
-    Optional<Revenue> findById(Long id);
+        Optional<Revenue> findById(Long id);
 
-    List<Revenue> findByApartment_ApartmentId(String apartmentId);
+        List<Revenue> findByApartment_ApartmentId(String apartmentId);
 
-    Optional<Revenue> findByApartment_ApartmentIdAndType(String apartmentId, String type);
+        Optional<Revenue> findByApartment_ApartmentIdAndType(String apartmentId, String type);
 
-    List<Revenue> findByType(String type);
+        List<Revenue> findByType(String type);
 
-    boolean existsByType(String type);
+        boolean existsByType(String type);
 
-    long countByType(String type);
+        long countByType(String type);
 
-    List<Revenue> findByTypeAndStatusIn(String type, List<String> statuses);
+        List<Revenue> findByTypeAndStatusIn(String type, List<String> statuses);
 
-    long countByTypeAndStatusNotIn(String type, List<String> statuses);
+        long countByTypeAndStatusNotIn(String type, List<String> statuses);
 
-    Optional<Revenue> findByPaymentToken(String paymentToken);
+        Optional<Revenue> findByPaymentToken(String paymentToken);
 
-    @Query("SELECT r FROM Revenue r WHERE r.endDate >= :startDate AND r.endDate <= :endDate AND r.status = 'Unpaid'")
-    List<Revenue> findUpcomingDueDates(@Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT r FROM Revenue r WHERE r.endDate >= :startDate AND r.endDate <= :endDate AND r.status = 'Unpaid'")
+        List<Revenue> findUpcomingDueDates(@Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT r FROM Revenue r WHERE r.apartment.apartmentId = :apartmentId AND r.endDate >= :startDate AND r.endDate <= :endDate AND r.status = 'Unpaid'")
-    List<Revenue> findUpcomingDueDatesByApartment(@Param("apartmentId") String apartmentId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT r FROM Revenue r WHERE r.apartment.apartmentId = :apartmentId AND r.endDate >= :startDate AND r.endDate <= :endDate AND r.status = 'Unpaid'")
+        List<Revenue> findUpcomingDueDatesByApartment(@Param("apartmentId") String apartmentId,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
+
+        // Find overdue unpaid revenues (where endDate < now and status is Unpaid)
+        @Query("SELECT r FROM Revenue r WHERE r.endDate < :now AND r.status = 'Unpaid'")
+        List<Revenue> findOverdueUnpaidRevenues(@Param("now") LocalDateTime now);
 
 }

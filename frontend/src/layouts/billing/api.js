@@ -184,3 +184,16 @@ export const getUpcomingRevenues = async (daysAhead = 7) => {
     return [];
   }
 };
+
+// Lấy tất cả contributions cho Admin
+export const getAllContributionsForAdmin = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/revenue/contribution/all`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy tất cả contributions:", error);
+    return [];
+  }
+};
