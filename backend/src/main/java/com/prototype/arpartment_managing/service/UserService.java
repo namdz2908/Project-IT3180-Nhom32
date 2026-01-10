@@ -305,7 +305,12 @@ public class UserService {
                     user.setPhoneNumber(userDTO.getPhoneNumber());
                     user.setRole(userDTO.getRole());
                     user.setCitizenIdentification(userDTO.getCitizenIdentification());
-                    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+                    // Chỉ cập nhật password nếu có giá trị mới (không rỗng)
+                    if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+                        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+                    }
+
                     // Cập nhật thông tin căn hộ nếu apartmentId thay đổi
                     if (userDTO.getApartmentId() != null) {
                         Apartment apartment = apartmentRepository.findByApartmentId(userDTO.getApartmentId())

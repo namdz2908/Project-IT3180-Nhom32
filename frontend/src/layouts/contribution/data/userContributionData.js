@@ -14,7 +14,7 @@ import MDInput from "components/MDInput";
 //ApartmentSelectTable
 import ApartmentSelectTable from "layouts/billing_management/data/apartmentSelectTable";
 
-export default function userContributionData({ apartmentId }) {
+export default function userContributionData({ apartmentId, refreshKey }) {
   const token = localStorage.getItem("token");
   let userRole = null;
   if (token) {
@@ -310,7 +310,7 @@ export default function userContributionData({ apartmentId }) {
 
   useEffect(() => {
     loadRevenues();
-  }, []);
+  }, [refreshKey]);
 
   const handleSearch = (e) => {
     e.preventDefault();
