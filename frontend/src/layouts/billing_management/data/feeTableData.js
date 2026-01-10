@@ -34,7 +34,9 @@ export default function useFeeData() {
       const response = await axios.get("http://localhost:8080/fees", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setFees(response.data);
+      // Filter out contribution fees (pricePerUnit === 1) - they belong to Contributions tab
+      const billingFees = response.data.filter((fee) => fee.pricePerUnit?.toString() !== "1");
+      setFees(billingFees);
     } catch (error) {
       console.error("Failed to load fees", error);
     }
