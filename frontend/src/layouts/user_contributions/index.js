@@ -272,7 +272,7 @@ function UserContributions() {
                     <Table
                       sx={{
                         minWidth: "100%",
-                        tableLayout: "auto",
+                        tableLayout: "fixed",
                       }}
                     >
                       <TableHead>
@@ -373,6 +373,8 @@ function UserContributions() {
                                 padding: "12px 16px",
                                 fontSize: "14px",
                                 color: "#666",
+                                width: "5%",
+                                verticalAlign: "middle",
                               }}
                             >
                               {index + 1}
@@ -382,6 +384,8 @@ function UserContributions() {
                                 padding: "12px 16px",
                                 fontSize: "14px",
                                 color: "#333",
+                                width: "25%",
+                                verticalAlign: "middle",
                               }}
                             >
                               {bill.type}
@@ -393,6 +397,8 @@ function UserContributions() {
                                 fontSize: "14px",
                                 color: "#333",
                                 fontWeight: "500",
+                                width: "15%",
+                                verticalAlign: "middle",
                               }}
                             >
                               {formatCurrency(bill.total)}
@@ -403,6 +409,8 @@ function UserContributions() {
                                 padding: "12px 16px",
                                 fontSize: "14px",
                                 color: "#666",
+                                width: "15%",
+                                verticalAlign: "middle",
                               }}
                             >
                               {formatCurrency(bill.used)} units
@@ -413,6 +421,8 @@ function UserContributions() {
                                 padding: "12px 16px",
                                 fontSize: "14px",
                                 color: "#666",
+                                width: "20%",
+                                verticalAlign: "middle",
                               }}
                             >
                               {formatDeadline(bill.paidDate || bill.endDate)}
@@ -424,6 +434,8 @@ function UserContributions() {
                                 fontSize: "14px",
                                 color: "#4caf50",
                                 fontWeight: "bold",
+                                width: "15%",
+                                verticalAlign: "middle",
                               }}
                             >
                               ✓ Paid

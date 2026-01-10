@@ -3,20 +3,8 @@ import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Icon,
-} from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, OutlinedInput, Box, Icon } from "@mui/material";
+import DataTable from "examples/Tables/DataTable";
 import { getRevenue, getFeeByType } from "../../api";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -115,6 +103,51 @@ function PaidBills() {
     // Join parts into result string
     return `${formattedDay}/${formattedMonth}/${year}`;
   };
+
+  const columns = [
+    { Header: "No", accessor: "no", width: "5%", align: "left" },
+    { Header: "Type", accessor: "type", width: "20%", align: "left" },
+    { Header: "Total Amount", accessor: "total", width: "20%", align: "left" },
+    { Header: "Price Per Unit", accessor: "price", width: "20%", align: "left" },
+    { Header: "Units Used", accessor: "used", width: "15%", align: "left" },
+    { Header: "Paid Date", accessor: "date", width: "15%", align: "left" },
+  ];
+
+  const rows = filteredBills.map((bill, index) => {
+    const fee = fees[bill.type];
+    return {
+      no: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {index + 1}
+        </MDTypography>
+      ),
+      type: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {bill.type}
+        </MDTypography>
+      ),
+      total: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {formatCurrency(bill.total)} VND
+        </MDTypography>
+      ),
+      price: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
+        </MDTypography>
+      ),
+      used: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {formatCurrency(bill.used)} units
+        </MDTypography>
+      ),
+      date: (
+        <MDTypography variant="caption" color="text" fontWeight="medium">
+          {formatDeadline(bill.paidDate)}
+        </MDTypography>
+      ),
+    };
+  });
   return (
     <Card>
       <MDBox
@@ -178,158 +211,20 @@ function PaidBills() {
 
         <MDBox
           sx={{
-            maxHeight: "510px",
-            overflowY: "auto",
-            border: "1px solid #ddd",
+            // maxHeight: "510px", // Removed fixed height to let table expand
+            // overflowY: "auto", // DataTable handles its own scroll/pagination usually
+            // overflowX: "auto",
+            // border: "1px solid #ddd", // DataTable usually has its own styling
             borderRadius: "8px",
           }}
         >
-          <Table sx={{ minWidth: "100%" }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell
-                  align="center"
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "5%",
-                  }}
-                >
-                  No.
-                </TableCell>
-                <TableCell
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "20%",
-                  }}
-                >
-                  Type
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "20%",
-                  }}
-                >
-                  Total amount
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "20%",
-                  }}
-                >
-                  Price per unit
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "15%",
-                  }}
-                >
-                  Units used
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{
-                    padding: "12px 16px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "#333",
-                    borderBottom: "1px solid #ddd",
-                    width: "15%",
-                  }}
-                >
-                  Paid date
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredBills.length > 0 ? (
-                filteredBills.map((bill, index) => {
-                  const fee = fees[bill.type];
-                  return (
-                    <TableRow
-                      key={bill.id}
-                      sx={{
-                        "&:hover": { backgroundColor: "#f9f9f9" },
-                        borderBottom: "1px solid #eee",
-                      }}
-                    >
-                      <TableCell
-                        align="center"
-                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
-                      >
-                        {index + 1}
-                      </TableCell>
-                      <TableCell sx={{ padding: "12px 16px", fontSize: "14px", color: "#333" }}>
-                        {bill.type}
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{
-                          padding: "12px 16px",
-                          fontSize: "14px",
-                          color: "#333",
-                          fontWeight: "500",
-                        }}
-                      >
-                        {formatCurrency(bill.total)} VND
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#333" }}
-                      >
-                        {fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
-                      >
-                        {formatCurrency(bill.used)} units
-                      </TableCell>
-                      <TableCell
-                        align="center"
-                        sx={{ padding: "12px 16px", fontSize: "14px", color: "#666" }}
-                      >
-                        {formatDeadline(bill.paidDate)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                    <MDTypography variant="body2" color="textSecondary">
-                      No matching results.
-                    </MDTypography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <DataTable
+            table={{ columns, rows }}
+            showTotalEntries={true}
+            isSorted={true}
+            noEndBorder
+            entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+          />
         </MDBox>
       </MDBox>
     </Card>

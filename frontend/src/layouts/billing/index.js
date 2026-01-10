@@ -88,9 +88,9 @@ function Billing() {
                     />
                   </Grid>
                 </Grid> */}
-                {/* <Grid item xs={12}>
+                <Grid item xs={12}>
                   <AddRevenue />
-                </Grid> */}
+                </Grid>
                 <Grid item xs={12}>
                   <Card>
                     <MDBox
