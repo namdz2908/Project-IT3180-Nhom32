@@ -82,9 +82,10 @@ export default function useRevenueData() {
 
   const loadRevenues = async () => {
     const data = await getAllInvoices();
-    // const filteredData = handleSearch(data)
-    setRevenues(data);
-    setFilteredRevenue(data);
+    // Filter out paid invoices - they will only show in Transaction History
+    const unpaidData = data.filter((bill) => bill.status !== "Paid");
+    setRevenues(unpaidData);
+    setFilteredRevenue(unpaidData);
     const formattedRows = data.map((bill, index) => ({
       id: ++index,
       type: (
@@ -363,15 +364,17 @@ export default function useRevenueData() {
   const filterRevenue = () => {
     const normalizedSearchTerm = searchTerm.toString().toLowerCase().trim();
 
-    const filtered = revenues.filter((rev) => {
-      if (searchType === "status") {
-        return rev.status?.toString().toLowerCase() === normalizedSearchTerm;
-      } else if (searchType === "apartmentId") {
-        return rev.apartmentId?.toString().toLowerCase() === normalizedSearchTerm;
-      } else {
-        return rev[searchType]?.toString().toLowerCase().includes(normalizedSearchTerm);
-      }
-    });
+    const filtered = revenues
+      .filter((rev) => rev.status !== "Paid") // Exclude paid invoices
+      .filter((rev) => {
+        if (searchType === "status") {
+          return rev.status?.toString().toLowerCase() === normalizedSearchTerm;
+        } else if (searchType === "apartmentId") {
+          return rev.apartmentId?.toString().toLowerCase() === normalizedSearchTerm;
+        } else {
+          return rev[searchType]?.toString().toLowerCase().includes(normalizedSearchTerm);
+        }
+      });
 
     setFilteredRevenue(filtered);
     const formattedRows = filtered.map((bill, index) => ({
@@ -787,10 +790,16 @@ export default function useRevenueData() {
 
   // );
 
+  // Calculate overdue count and unpaid count
+  const overdueCount = revenues.filter((rev) => rev.status === "Overdue").length;
+  const unpaidCount = revenues.filter((rev) => rev.status === "Unpaid").length;
+
   return {
     columns,
     rows,
     searchUI,
-    // dialogs,
+    overdueCount,
+    unpaidCount,
+    totalInvoices: revenues.length,
   };
 }

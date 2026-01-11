@@ -67,10 +67,9 @@ public class RevenueScheduler {
             int count = 0;
             int failed = 0;
 
-            // Set end date to the last day of the next month
-            LocalDateTime endDate = LocalDateTime.now()
-                    .plusMonths(1)
-                    .with(TemporalAdjusters.lastDayOfMonth()); // Define revenue types to generate
+            // Set end date to 5 days after invoice creation
+            // This gives residents a reasonable time to pay after receiving the bill
+            LocalDateTime endDate = LocalDateTime.now().plusDays(5); // Define revenue types to generate
             String[] revenueTypes = { "Service", "Water", "Electricity", "Vehicle" };
 
             for (Apartment apartment : apartments) {
@@ -161,7 +160,7 @@ public class RevenueScheduler {
         try {
             switch (type) {
                 case "Service":
-                    // Service might be based on area, so we don't reset it
+                    // Service is based on area, so we don't reset it
                     break;
                 case "Water":
                     apartment.setWaterUsage(0.0);
@@ -170,10 +169,12 @@ public class RevenueScheduler {
                     apartment.setElectricityUsage(0.0);
                     break;
                 case "Vehicle":
-                    // Vehicle count might be constant, so don't reset
+                    // Vehicle count is constant, so don't reset
                     break;
             }
             apartmentRepository.save(apartment);
+            logger.debug("Reset usage counter for {} in apartment {}",
+                    type, apartment.getApartmentId());
         } catch (Exception e) {
             logger.error("Failed to reset usage counter for {} in apartment {}: {}",
                     type, apartment.getApartmentId(), e.getMessage());
@@ -187,7 +188,15 @@ public class RevenueScheduler {
      */
     private double calculateServiceUsage(Apartment apartment) {
         // Service fees are typically based on apartment area
+        // Only charge service fee if apartment has occupants
         try {
+            // Skip service fee for empty apartments (no occupants)
+            if (apartment.getOccupants() == null || apartment.getOccupants() <= 0) {
+                logger.info("Skipping service fee for apartment {} - no occupants",
+                        apartment.getApartmentId());
+                return 0.0;
+            }
+
             if (apartment.getServiceUsage() != null && apartment.getServiceUsage() > 0) {
                 // Use the stored service usage value
                 return apartment.getServiceUsage();

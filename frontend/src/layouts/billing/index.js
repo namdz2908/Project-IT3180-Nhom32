@@ -88,9 +88,11 @@ function Billing() {
                     />
                   </Grid>
                 </Grid> */}
-                <Grid item xs={12}>
-                  <AddRevenue />
-                </Grid>
+                {false && (
+                  <Grid item xs={12}>
+                    <AddRevenue />
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <Card>
                     <MDBox
@@ -126,7 +128,7 @@ function Billing() {
                     </MDBox>
                   </Card>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} sx={{ mt: 3 }}>
                   <PaidBills />
                 </Grid>
               </Grid>

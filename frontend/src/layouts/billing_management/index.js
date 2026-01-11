@@ -31,10 +31,23 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import useFeeData from "layouts/billing_management/data/feeTableData";
 import useRevenueData from "layouts/billing_management/data/revenueTableData";
+import usePaidTransactionHistory from "layouts/billing_management/data/paidTransactionHistory";
 
 function BillingTable() {
   const { columns, rows, searchUI } = useFeeData();
-  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = useRevenueData();
+  const {
+    columns: mColumns,
+    rows: mRows,
+    searchUI: mSearchUI,
+    overdueCount = 0,
+    unpaidCount = 0,
+  } = useRevenueData();
+  const {
+    columns: pColumns,
+    rows: pRows,
+    searchUI: pSearchUI,
+    totalPaid,
+  } = usePaidTransactionHistory();
 
   return (
     <DashboardLayout>
@@ -123,9 +136,26 @@ function BillingTable() {
                     Invoice Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage all invoices
+                    Manage all invoices ({unpaidCount + overdueCount} pending)
                   </MDTypography>
                 </MDBox>
+                {overdueCount > 0 && (
+                  <MDBox
+                    display="flex"
+                    alignItems="center"
+                    sx={{
+                      backgroundColor: "rgba(255, 152, 0, 0.2)",
+                      borderRadius: "8px",
+                      px: 2,
+                      py: 1,
+                    }}
+                  >
+                    <Icon sx={{ mr: 1, color: "#ff9800" }}>warning</Icon>
+                    <MDTypography variant="button" sx={{ color: "#ff9800" }} fontWeight="medium">
+                      {overdueCount} overdue
+                    </MDTypography>
+                  </MDBox>
+                )}
               </MDBox>
               <MDBox px={2} py={3}>
                 {mSearchUI}
@@ -142,6 +172,63 @@ function BillingTable() {
                 >
                   <DataTable
                     table={{ columns: mColumns, rows: mRows }}
+                    isSorted={false}
+                    entriesPerPage={{
+                      defaultValue: 10,
+                      entries: [5, 10, 15, 20, 25],
+                    }}
+                    showTotalEntries={true}
+                    noEndBorder
+                    canSearch={false}
+                  />
+                </MDBox>
+              </MDBox>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="success"
+                borderRadius="lg"
+                coloredShadow="success"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDBox>
+                  <MDTypography
+                    variant="h6"
+                    color="white"
+                    sx={{ display: "flex", alignItems: "center" }}
+                  >
+                    <Icon sx={{ mr: 1 }}>check_circle</Icon>
+                    Transaction History
+                  </MDTypography>
+                  <MDTypography variant="button" color="white" opacity={0.8}>
+                    History of all paid invoices ({totalPaid})
+                  </MDTypography>
+                </MDBox>
+              </MDBox>
+              <MDBox px={2} py={3}>
+                {pSearchUI}
+                <MDBox
+                  sx={{
+                    overflowX: "auto",
+                    maxHeight: "500px",
+                    "& .MuiTableRow-root:hover": {
+                      backgroundColor: ({ palette: { grey } }) => grey[100],
+                      cursor: "pointer",
+                      transition: "all 0.2s ease-in-out",
+                    },
+                  }}
+                >
+                  <DataTable
+                    table={{ columns: pColumns, rows: pRows }}
                     isSorted={false}
                     entriesPerPage={{
                       defaultValue: 10,
