@@ -57,3 +57,15 @@ VALUES
 ('User A206', 'user_a206', 'user_a206@example.com',
  '$2a$10$4SBw2pqV6vmH175JiDZS4eLgamnAxIYuSwHvAmoylkwUNkrV9tzXe',
  '0910000206', 'USER', '987654322206', 'A206', 1);
+UPDATE users
+SET password = '$2a$10$mAdmlkKLHoCxdfduXmbDa.WasEkMIeMbD2qSVK4QBxBDzPTyR1826'
+WHERE username IN (
+    'user_a102', 'user_a103', 'user_a104', 'user_a105', 'user_a106',
+    'user_a201', 'user_a202', 'user_a203', 'user_a204', 'user_a205', 'user_a206'
+);
+
+INSERT INTO fees (type, price_per_unit) VALUES
+('water', 5000),
+('electricity', 1230),
+('service', 8000),
+('donate', 1);

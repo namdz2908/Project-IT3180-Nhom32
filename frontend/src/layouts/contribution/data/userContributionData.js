@@ -75,7 +75,7 @@ export default function userContributionData({ apartmentId, refreshKey }) {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const filteredFees = response.data.filter((fee) => {
-        return fee.pricePerUnit?.toString() == "1";
+        return fee.pricePerUnit == 1;
       });
       // setFees(filteredFees);
       // Lấy danh sách các type duy nhất
@@ -226,6 +226,12 @@ export default function userContributionData({ apartmentId, refreshKey }) {
   useEffect(() => {
     console.log("Edit Revenue đã thay đổi:", editRevenue);
   }, [editRevenue]);
+
+  useEffect(() => {
+    if (createDialogOpen && !newRevenue.type && feeTypes.length > 0) {
+      setNewRevenue((prev) => ({ ...prev, type: feeTypes[0] }));
+    }
+  }, [feeTypes, createDialogOpen]);
 
   const handleEditClick = (item) => {
     console.log("Bill Data:", item);

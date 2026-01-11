@@ -41,11 +41,11 @@ function AddRevenue() {
     water: 5000, // Price per unit of water
     electricity: 1230, // Price per unit of electricity
     service: 8000, // Fixed service fee
-    donate: 0, // Donation
+    donate: 1, // Contribution (Price=1)
   };
   const [newRevenue, setNewRevenue] = useState({
     type: "",
-    apartmentID: "",
+    apartmentID: localStorage.getItem("apartmentId") || "",
     total: "",
     fee: "",
     used: "",
@@ -91,10 +91,10 @@ function AddRevenue() {
     }
     const payload = {
       type: newRevenue.type,
-      apartmentId: localStorage.getItem("apartmentId").toString(), // Get from localStorage
+      apartmentId: newRevenue.apartmentID, // Use the input value
       used: newRevenue.used,
-      total: newRevenue.used * newRevenue.fee, // Calculate total
-      status: "false",
+      total: newRevenue.used * newRevenue.fee,
+      status: "Unpaid",
     };
     try {
       console.log(payload);
@@ -102,10 +102,16 @@ function AddRevenue() {
       console.log("Fee added successfully:", result);
       alert("Fee has been added!");
       // Reset form after successful submission
-      setNewRevenue({ type: "", fee: "", used: "", total: "" });
+      setNewRevenue({
+        type: "",
+        fee: "",
+        used: "",
+        total: "",
+        apartmentID: newRevenue.apartmentID,
+      });
     } catch (error) {
       console.error("Error adding fee:", error);
-      alert("An error occurred while creating the fee. Please try again!");
+      alert(`An error occurred: ${error.response?.data?.message || error.message}`);
     }
   };
   return (
@@ -136,20 +142,20 @@ function AddRevenue() {
               <option value="water">Water</option>
               <option value="electricity">Electricity</option>
               <option value="service">Service</option>
-              <option value="donate">Donation</option>
+              <option value="donate">Contribution</option>
             </TextField>
           </Grid>
           {/* Apartment ID Field */}
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label={`Apartment ID: ${localStorage.getItem("apartmentId") || 3333}`}
+              label="Apartment ID"
               name="apartmentID"
               value={newRevenue.apartmentID}
               onChange={handleInputChange}
               variant="outlined"
               margin="normal"
-              disabled
+              placeholder={localStorage.getItem("apartmentId") || "Enter Apartment ID"}
             />
           </Grid>
           {/* Total Amount Field */}
