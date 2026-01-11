@@ -169,7 +169,7 @@ function PaidBills() {
             Paid Fees
           </MDTypography>
           <MDTypography variant="button" color="white" opacity={0.8}>
-            History of your paid contributions and fees
+            History of your paid fees
           </MDTypography>
         </MDBox>
       </MDBox>
