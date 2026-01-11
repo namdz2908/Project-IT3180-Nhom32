@@ -8,14 +8,10 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { FormControl, OutlinedInput } from "@mui/material";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Contribution from "layouts/billing/components/Contribution";
 import { getContribution, getFeeByType } from "layouts/billing/api";
 import QRModal from "layouts/billing/components/QR/QRModal";
+import DataTable from "examples/Tables/DataTable";
 
 function UserContributions() {
   const [bills, setBills] = useState([]);
@@ -26,6 +22,10 @@ function UserContributions() {
   const apartmentId = localStorage.getItem("apartmentId");
   const [qrCodeData, setQrCodeData] = useState(null);
   const [openQRModal, setOpenQRModal] = useState(false);
+
+  // State for Paid Contributions Search
+  const [paidSearchField, setPaidSearchField] = useState("type");
+  const [paidSearchKeyword, setPaidSearchKeyword] = useState("");
 
   // Lấy danh sách hóa đơn contribution theo apartmentId
   useEffect(() => {
@@ -76,14 +76,21 @@ function UserContributions() {
 
   const totalUnpaid = filteredBills.length;
 
-  // Lấy danh sách những bill đã thanh toán
-  const paidBills = bills.filter((bill) => bill.status === "Paid");
+  // Lọc danh sách bill đã thanh toán
+  const paidBills = bills
+    .filter((bill) => bill.status === "Paid")
+    .filter((bill) => {
+      const value = bill[paidSearchField]?.toLowerCase() || "";
+      return value.includes(paidSearchKeyword.toLowerCase());
+    });
+
+  const totalPaid = paidBills.length;
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN").format(amount);
   };
 
-  const formatDeadline = (dateString) => {
+  const formatDeadline = (dateString, isPaidDate = false) => {
     if (!dateString || typeof dateString !== "string") {
       return "Unlimited";
     }
@@ -97,8 +104,58 @@ function UserContributions() {
     }
     const formattedMonth = parseInt(month, 10).toString();
     const formattedDay = parseInt(day, 10).toString();
+
+    if (isPaidDate) {
+      // Format dd/mm/yyyy for table
+      return `${formattedDay}/${formattedMonth}/${year}`;
+    }
+    // Original format for cards
     return `${formattedDay} tháng ${formattedMonth} năm ${year}`;
   };
+
+  // DataTable Columns
+  const columns = [
+    { Header: "No", accessor: "no", width: "5%", align: "left" },
+    { Header: "Contribution Type", accessor: "type", width: "25%", align: "left" },
+    { Header: "Amount (VND)", accessor: "amount", width: "15%", align: "center" },
+    { Header: "Unit Used", accessor: "unit", width: "15%", align: "center" },
+    { Header: "Paid Date", accessor: "date", width: "20%", align: "center" },
+    { Header: "Status", accessor: "status", width: "15%", align: "center" },
+  ];
+
+  // DataTable Rows
+  const rows = paidBills.map((bill, index) => ({
+    no: (
+      <MDTypography variant="body2" color="text" fontWeight="medium">
+        {index + 1}
+      </MDTypography>
+    ),
+    type: (
+      <MDTypography variant="body2" color="text" fontWeight="medium">
+        {bill.type}
+      </MDTypography>
+    ),
+    amount: (
+      <MDTypography variant="h6" color="text" fontWeight="medium">
+        {formatCurrency(bill.total)}
+      </MDTypography>
+    ),
+    unit: (
+      <MDTypography variant="body2" color="text" fontWeight="medium">
+        {formatCurrency(bill.used)} units
+      </MDTypography>
+    ),
+    date: (
+      <MDTypography variant="body2" color="text" fontWeight="medium">
+        {formatDeadline(bill.paidDate || bill.endDate, true)}
+      </MDTypography>
+    ),
+    status: (
+      <MDTypography variant="body2" color="success" fontWeight="bold">
+        ✓ Paid
+      </MDTypography>
+    ),
+  }));
 
   return (
     <DashboardLayout>
@@ -257,201 +314,60 @@ function UserContributions() {
               </MDBox>
 
               <MDBox px={3} py={3}>
+                {/* Search Bar for Paid Contributions */}
+                <MDBox display="flex" alignItems="center" mb={2}>
+                  <MDBox mr={1}>
+                    <select
+                      value={paidSearchField}
+                      onChange={(e) => setPaidSearchField(e.target.value)}
+                      style={{
+                        height: "38px",
+                        padding: "0 15px",
+                        borderRadius: "8px",
+                        borderColor: "#d2d6da",
+                        marginRight: "10px",
+                        width: "150px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="type">Fee Name</option>
+                    </select>
+                  </MDBox>
+
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <OutlinedInput
+                      placeholder="Enter fee name..."
+                      value={paidSearchKeyword}
+                      onChange={(e) => setPaidSearchKeyword(e.target.value)}
+                    />
+                  </FormControl>
+                </MDBox>
+
+                <MDBox pt={1} mb={2}>
+                  <MDTypography variant="subtitle2" color="black">
+                    Number of paid contributions: <strong>{totalPaid}</strong>
+                  </MDTypography>
+                </MDBox>
+
                 {loading ? (
                   <MDTypography variant="body2" color="text">
                     Loading...
                   </MDTypography>
-                ) : paidBills.length > 0 ? (
+                ) : (
                   <MDBox
                     sx={{
-                      overflowX: "auto",
-                      border: "1px solid #ddd",
                       borderRadius: "8px",
                     }}
                   >
-                    <Table
-                      sx={{
-                        minWidth: "100%",
-                        tableLayout: "fixed",
-                      }}
-                    >
-                      <TableHead>
-                        <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "5%",
-                            }}
-                          >
-                            No.
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "25%",
-                            }}
-                          >
-                            Contribution Type
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "15%",
-                            }}
-                          >
-                            Amount (VND)
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "15%",
-                            }}
-                          >
-                            Unit Used
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "20%",
-                            }}
-                          >
-                            Paid date
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              padding: "12px 16px",
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              color: "#333",
-                              borderBottom: "1px solid #ddd",
-                              width: "15%",
-                            }}
-                          >
-                            Status
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {paidBills.map((bill, index) => (
-                          <TableRow
-                            key={bill.id}
-                            sx={{
-                              "&:hover": {
-                                backgroundColor: "#f9f9f9",
-                              },
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            <TableCell
-                              align="center"
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#666",
-                                width: "5%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              {index + 1}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#333",
-                                width: "25%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              {bill.type}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#333",
-                                fontWeight: "500",
-                                width: "15%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              {formatCurrency(bill.total)}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#666",
-                                width: "15%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              {formatCurrency(bill.used)} units
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#666",
-                                width: "20%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              {formatDeadline(bill.paidDate || bill.endDate)}
-                            </TableCell>
-                            <TableCell
-                              align="center"
-                              sx={{
-                                padding: "12px 16px",
-                                fontSize: "14px",
-                                color: "#4caf50",
-                                fontWeight: "bold",
-                                width: "15%",
-                                verticalAlign: "middle",
-                              }}
-                            >
-                              ✓ Paid
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <DataTable
+                      table={{ columns, rows }}
+                      showTotalEntries={true}
+                      isSorted={true}
+                      noEndBorder
+                      entriesPerPage={{ defaultValue: 5, entries: [5, 10, 15, 20, 25] }}
+                    />
                   </MDBox>
-                ) : (
-                  <MDTypography
-                    variant="caption"
-                    sx={{ color: "#999", display: "flex", paddingTop: "16px" }}
-                  >
-                    No paid contributions yet.
-                  </MDTypography>
                 )}
               </MDBox>
             </Card>

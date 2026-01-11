@@ -117,32 +117,32 @@ function PaidBills() {
     const fee = fees[bill.type];
     return {
       no: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="body2" color="text" fontWeight="medium">
           {index + 1}
         </MDTypography>
       ),
       type: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="body2" color="text" fontWeight="medium">
           {bill.type}
         </MDTypography>
       ),
       total: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="h6" color="text" fontWeight="medium">
           {formatCurrency(bill.total)} VND
         </MDTypography>
       ),
       price: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="h6" color="text" fontWeight="medium">
           {fee ? `${formatCurrency(fee.pricePerUnit)} VND` : "Updating..."}
         </MDTypography>
       ),
       used: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="body2" color="text" fontWeight="medium">
           {formatCurrency(bill.used)} units
         </MDTypography>
       ),
       date: (
-        <MDTypography variant="caption" color="text" fontWeight="medium">
+        <MDTypography variant="body2" color="text" fontWeight="medium">
           {formatDeadline(bill.paidDate)}
         </MDTypography>
       ),
