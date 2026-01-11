@@ -6,6 +6,7 @@ public class ApartmentTableDTO {
     private Integer occupants;
     private Float area;
     private String apartmentType;
+    private Integer vehicleCount; // thêm dòng này
 
     public ApartmentTableDTO() {}
 
@@ -57,5 +58,13 @@ public class ApartmentTableDTO {
 
     public void setApartmentType(String apartmentType) {
         this.apartmentType = apartmentType;
+    }
+    // Thêm getter/setter cho vehicle_count
+    public Integer getVehicleCount() {
+        return vehicleCount;
+    }
+
+    public void setVehicleCount(Integer vehicleCount) {
+        this.vehicleCount = vehicleCount;
     }
 }
