@@ -35,7 +35,13 @@ import usePaidTransactionHistory from "layouts/billing_management/data/paidTrans
 
 function BillingTable() {
   const { columns, rows, searchUI } = useFeeData();
-  const { columns: mColumns, rows: mRows, searchUI: mSearchUI } = useRevenueData();
+  const {
+    columns: mColumns,
+    rows: mRows,
+    searchUI: mSearchUI,
+    overdueCount = 0,
+    unpaidCount = 0,
+  } = useRevenueData();
   const {
     columns: pColumns,
     rows: pRows,
@@ -130,9 +136,26 @@ function BillingTable() {
                     Invoice Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage all invoices
+                    Manage all invoices ({unpaidCount + overdueCount} pending)
                   </MDTypography>
                 </MDBox>
+                {overdueCount > 0 && (
+                  <MDBox
+                    display="flex"
+                    alignItems="center"
+                    sx={{
+                      backgroundColor: "rgba(255, 152, 0, 0.2)",
+                      borderRadius: "8px",
+                      px: 2,
+                      py: 1,
+                    }}
+                  >
+                    <Icon sx={{ mr: 1, color: "#ff9800" }}>warning</Icon>
+                    <MDTypography variant="button" sx={{ color: "#ff9800" }} fontWeight="medium">
+                      {overdueCount} overdue
+                    </MDTypography>
+                  </MDBox>
+                )}
               </MDBox>
               <MDBox px={2} py={3}>
                 {mSearchUI}
