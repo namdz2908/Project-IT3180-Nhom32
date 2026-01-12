@@ -4,6 +4,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import DataTable from "examples/Tables/DataTable";
 import userContributionData from "layouts/contribution/data/userContributionData";
 import useContributionFeeData from "layouts/contribution/data/contributionFeeTableData";
+import usePaidContributionHistory from "layouts/contribution/data/paidContributionHistory";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
@@ -26,6 +27,12 @@ function UserContributionTable() {
     rows: feeRows,
     searchUI: feeSearchUI,
   } = useContributionFeeData({ onContributionCreated: handleContributionCreated });
+  const {
+    columns: pColumns,
+    rows: pRows,
+    searchUI: pSearchUI,
+    totalPaid,
+  } = usePaidContributionHistory({ apartmentId, refreshKey });
 
   return (
     <DashboardLayout>
@@ -117,7 +124,7 @@ function UserContributionTable() {
                     Contribution Table
                   </MDTypography>
                   <MDTypography variant="button" color="white" opacity={0.8}>
-                    Manage your contributions
+                    Manage all contributions
                   </MDTypography>
                 </MDBox>
               </MDBox>
@@ -136,6 +143,63 @@ function UserContributionTable() {
                 >
                   <DataTable
                     table={{ columns, rows }}
+                    isSorted={false}
+                    entriesPerPage={{
+                      defaultValue: 10,
+                      entries: [5, 10, 15, 20, 25],
+                    }}
+                    showTotalEntries={true}
+                    noEndBorder
+                    canSearch={false}
+                  />
+                </MDBox>
+              </MDBox>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="success"
+                borderRadius="lg"
+                coloredShadow="success"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <MDBox>
+                  <MDTypography
+                    variant="h6"
+                    color="white"
+                    sx={{ display: "flex", alignItems: "center" }}
+                  >
+                    <Icon sx={{ mr: 1 }}>check_circle</Icon>
+                    Contribution History
+                  </MDTypography>
+                  <MDTypography variant="button" color="white" opacity={0.8}>
+                    History of all paid contributions ({totalPaid})
+                  </MDTypography>
+                </MDBox>
+              </MDBox>
+              <MDBox px={2} py={3}>
+                {pSearchUI}
+                <MDBox
+                  sx={{
+                    overflowX: "auto",
+                    maxHeight: "500px",
+                    "& .MuiTableRow-root:hover": {
+                      backgroundColor: ({ palette: { grey } }) => grey[100],
+                      cursor: "pointer",
+                      transition: "all 0.2s ease-in-out",
+                    },
+                  }}
+                >
+                  <DataTable
+                    table={{ columns: pColumns, rows: pRows }}
                     isSorted={false}
                     entriesPerPage={{
                       defaultValue: 10,

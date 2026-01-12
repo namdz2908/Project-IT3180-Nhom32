@@ -94,10 +94,11 @@ export default function userContributionData({ apartmentId, refreshKey }) {
       data = await getContribution(apartmentId);
     }
 
-    // const filteredData = handleSearch(data)
-    setRevenues(data);
-    setFilteredRevenue(data);
-    const formattedRows = data.map((bill, index) => ({
+    // Filter out paid invoices - they will only show in Transaction History
+    const unpaidData = data.filter((bill) => bill.status !== "Paid");
+    setRevenues(unpaidData);
+    setFilteredRevenue(unpaidData);
+    const formattedRows = unpaidData.map((bill, index) => ({
       id: ++index,
       type: (
         <MDTypography variant="button" fontWeight="medium">
@@ -302,9 +303,11 @@ export default function userContributionData({ apartmentId, refreshKey }) {
   };
 
   const filterRevenue = () => {
-    const filtered = revenues.filter((revenue) => {
-      return revenue[searchType]?.toString().toLowerCase().includes(searchTerm.toLowerCase());
-    });
+    const filtered = revenues
+      .filter((revenue) => revenue.status !== "Paid")
+      .filter((revenue) => {
+        return revenue[searchType]?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+      });
     setFilteredRevenue(filtered);
   };
 
