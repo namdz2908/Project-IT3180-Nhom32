@@ -207,6 +207,7 @@ export default function App() {
         {layout === "vr" && <Configurator />}
         <Routes>
           <Route path="/payment/complete/:paymentToken" element={<PaymentComplete />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
           {getRoutes(routes)}
           <Route
             path="*"
@@ -241,6 +242,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
+        <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/authentication/forget-password" element={<ForgetPassword />} />
         <Route
           path="*"
