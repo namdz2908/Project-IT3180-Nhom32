@@ -56,10 +56,13 @@ function configs(labels, datasets) {
         legend: {
           display: false,
         },
+        tooltip: {
+          enabled: true,
+        },
       },
       interaction: {
-        intersect: false,
-        mode: "index",
+        intersect: true,
+        mode: "nearest",
       },
     },
   };
