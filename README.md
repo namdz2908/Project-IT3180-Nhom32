@@ -44,7 +44,9 @@ cd Project-IT3180-Nhom32
    * Chọn file `database/init_test_data.sql` nằm trong thư mục gốc của dự án.
    * Nhấn nút **Execute** (hình tia sét) để tạo Database và thêm các bản ghi mẫu (Căn hộ & Người dùng).
    * Lưu ý: Nếu thêm dữ liệu trực tiếp trong db thì phải tự set lại ocupants của các căn hộ trên giao diện
-4. Cấu hình thông tin kết nối trong file `backend/src/main/resources/application.properties` để khớp với máy của bạn:
+4. Cấu hình thông tin kết nối:
+   * Sửa file `backend/src/main/resources/application.properties.example` thành `backend/src/main/resources/application.properties`.
+   * Mở file `application.properties` và chỉnh sửa thông tin kết nối để khớp với máy của bạn:
    ```properties
    # Đảm bảo URL trỏ đúng về localhost:3306 và tên Schema bạn đã tạo
    spring.datasource.url=jdbc:mysql://localhost:3306/<Your_Schema_Name>?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
