@@ -244,8 +244,31 @@ export default function useContributionFeeData({ onContributionCreated }) {
           width="100%"
           mb={2}
         >
-          <MDButton variant="gradient" color="dark" onClick={handleCreateTypeClick}>
-            <Icon>add</Icon>&nbsp;Create Type
+          <MDButton
+            variant="gradient"
+            color="dark"
+            onClick={handleCreateTypeClick}
+            sx={{
+              mr: 2,
+              px: 2,
+              py: 0.75,
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              minWidth: "auto",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)",
+              },
+              "& .material-icons-round": {
+                fontSize: "1.25rem",
+                marginRight: "2px",
+              },
+            }}
+          >
+            <Icon>add</Icon> Create Type
           </MDButton>
 
           <MDInput
@@ -253,9 +276,28 @@ export default function useContributionFeeData({ onContributionCreated }) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             fullWidth
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: ({ palette: { info } }) => info.main,
+                },
+              },
+            }}
           />
 
-          <MDButton type="submit" variant="gradient" color="dark">
+          <MDButton
+            type="submit"
+            variant="gradient"
+            color="dark"
+            sx={{
+              ml: 1,
+              px: 3,
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)",
+              },
+            }}
+          >
             <Icon>search</Icon>
           </MDButton>
 
@@ -265,6 +307,14 @@ export default function useContributionFeeData({ onContributionCreated }) {
             onClick={() => {
               setSearchTerm("");
               setFees(allFees);
+            }}
+            sx={{
+              ml: 1,
+              px: 3,
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)",
+              },
             }}
           >
             <Icon>refresh</Icon>
