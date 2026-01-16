@@ -50,8 +50,7 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
 // Images
-import brandWhite from "assets/images/logo-ct.png";
-import brandDark from "assets/images/logo-ct-dark.png";
+import logoBluemoon from "assets/images/logo-bluemoon.jpg";
 import { ProSidebarProvider } from "react-pro-sidebar";
 
 // Forget Password
@@ -193,7 +192,7 @@ export default function App() {
             <ProSidebarProvider>
               <Sidenav
                 color={sidenavColor}
-                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                brand={logoBluemoon}
                 brandName="Bluemoon Apartment"
                 routes={routes}
                 onMouseEnter={handleOnMouseEnter}
@@ -228,7 +227,7 @@ export default function App() {
           <ProSidebarProvider>
             <Sidenav
               color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+              brand={logoBluemoon}
               brandName="Bluemoon Apartment"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
